@@ -173,35 +173,35 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@PreAuthorize(&quot;hasAuthority(&#x27;pms:brand:read&#x27;)&quot;)</span></span><br><span class="line"><span class="keyword">public</span> CommonResult&lt;List&lt;PmsBrand&gt;&gt; <span class="title function_">getBrandList</span><span class="params">()</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> CommonResult.success(brandService.listAllBrand());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <h2 id="认证与授权流程演示"><a href="#认证与授权流程演示" class="headerlink" title="认证与授权流程演示"></a>认证与授权流程演示</h2><p>Swagger api地址：<a target="_blank" rel="noopener" href="http://localhost:8080/swagger-ui.html">http://localhost:8080/swagger-ui.html</a></p>
-<p><img src="/.io//arch_screen_14.png" alt="img"></p>
-<h3 id="未登录前访问接口"><a href="#未登录前访问接口" class="headerlink" title="未登录前访问接口"></a>未登录前访问接口</h3><p><img src="/.io//arch_screen_15.png" alt="img"></p>
-<p><img src="/.io//arch_screen_16.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_14.png" alt="img"></p>
+<h3 id="未登录前访问接口"><a href="#未登录前访问接口" class="headerlink" title="未登录前访问接口"></a>未登录前访问接口</h3><p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_15.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_16.png" alt="img"></p>
 <h3 id="登录后访问接口"><a href="#登录后访问接口" class="headerlink" title="登录后访问接口"></a>登录后访问接口</h3><ul>
 <li>进行登录操作：登录帐号test 123456</li>
 </ul>
-<p><img src="/.io//arch_screen_17.png" alt="img"></p>
-<p><img src="/.io//arch_screen_18.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_17.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_18.png" alt="img"></p>
 <ul>
 <li>点击Authorize按钮，在弹框中输入登录接口中获取到的token信息</li>
 </ul>
-<p><img src="/.io//arch_screen_19.png" alt="img"></p>
-<p><img src="/.io//arch_screen_20.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_19.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_20.png" alt="img"></p>
 <ul>
 <li>登录后访问获取权限列表接口，发现已经可以正常访问</li>
 </ul>
-<p><img src="/.io//arch_screen_15.png" alt="img"></p>
-<p><img src="/.io//arch_screen_21.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_15.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_21.png" alt="img"></p>
 <h3 id="访问需要权限的接口"><a href="#访问需要权限的接口" class="headerlink" title="访问需要权限的接口"></a>访问需要权限的接口</h3><blockquote>
 <p>由于test帐号并没有设置任何权限，所以他无法访问具有<code>pms:brand:read</code>权限的获取品牌列表接口。</p>
 </blockquote>
-<p><img src="/.io//arch_screen_22.png" alt="img"></p>
-<p><img src="/.io//arch_screen_23.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_22.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_23.png" alt="img"></p>
 <h3 id="改用其他有权限的帐号登录"><a href="#改用其他有权限的帐号登录" class="headerlink" title="改用其他有权限的帐号登录"></a>改用其他有权限的帐号登录</h3><blockquote>
 <p>改用admin 123456登录后访问，点击Authorize按钮打开弹框,点击logout登出后再重新输入新token。</p>
 </blockquote>
 <p><code>注意</code>：如果admin帐号密码不对的话，公众号后台回复<code>体验</code>来获取。</p>
-<p><img src="/.io//arch_screen_22.png" alt="img"></p>
-<p><img src="/.io//arch_screen_24.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_22.png" alt="img"></p>
+<p><img src="/2022/04/15/Java/JWT/%E6%95%B4%E5%90%88SpringSecurity%E5%92%8CJWT%E5%AE%9E%E7%8E%B0%E8%AE%A4%E8%AF%81%E5%92%8C%E6%8E%88%E6%9D%83/arch_screen_24.png" alt="img"></p>
  
       <!-- reward -->
       

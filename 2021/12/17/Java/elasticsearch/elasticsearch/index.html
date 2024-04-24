@@ -114,7 +114,7 @@
 <h3 id="倒排索引"><a href="#倒排索引" class="headerlink" title="倒排索引"></a>倒排索引</h3><p>先将文档中包含的关键字全部提取出来<br>然后再将关键字与文档的对应关系保存起来<br>最后对关键字本身做索引排序。<br>这样在用户检索关键字时， 可以先查找关键字索引，在通过关键字与文档的对应关系查找到所在的文档。</p>
 <p>如下面的两个文档：</p>
 <p>文档1： I love elasticsearch<br>文档2： I love logstash<br>他们对应的倒排索引为： “√” 表示文档中包含这个关键字</p>
-<p><img src="/.io//1640660690269.png" alt="1640660690269"></p>
+<p><img src="/2021/12/17/Java/elasticsearch/elasticsearch/1640660690269.png" alt="1640660690269"></p>
 <h3 id="分片（shard）："><a href="#分片（shard）：" class="headerlink" title="分片（shard）："></a>分片（shard）：</h3><p>如果我们的索引数据量很大，超过硬件存放单个文件的限制，就会影响查询请求的速度，ES引入了分片技术。一个分片本身就是一个完成的搜索引擎，文档存储在分片中，而分片会被分配到集群中的各个节点中，随着集群的扩大和缩小，<strong>ES会自动的将分片在节点之间进行迁移</strong>，以保证集群能保持一种平衡。分片有以下特点：</p>
 <ol>
 <li><strong>ES的一个索引可以包含多个分片（shard）</strong>；</li>
@@ -166,8 +166,7 @@
 <ul>
 <li>访问会返回版本信息：<a target="_blank" rel="noopener" href="http://192.168.3.101:9200/">http://192.168.3.101:9200</a></li>
 </ul>
-<img src="/.io//12/17/Java/elasticsearch/elasticsearch/mall_linux_deploy_08-1640796877265.png" class title="img">
-
+<p><img src="/2021/12/17/Java/elasticsearch/elasticsearch/mall_linux_deploy_08-1640796877265.png" alt="img"></p>
 <h4 id="es插件卸载"><a href="#es插件卸载" class="headerlink" title="es插件卸载"></a>es插件卸载</h4><p>查看安装了哪些插件</p>
 <p>.&#x2F;bin&#x2F;<a target="_blank" rel="noopener" href="https://so.csdn.net/so/search?q=elasticsearch">elasticsearch</a>-plugin list</p>
 <p>a. 卸载x-pack插件<br>.&#x2F;bin&#x2F;elasticsearch-plugin remove x-pack</p>
@@ -191,12 +190,7 @@
 <ul>
 <li>访问地址进行测试：<a target="_blank" rel="noopener" href="http://192.168.3.101:5601/">http://192.168.3.101:5601</a></li>
 </ul>
-<img src="/.io//12/17/Java/elasticsearch/elasticsearch/mall_linux_deploy_09-1640797262306.png" class title="img">
-
-
-
-
-
+<p><img src="/2021/12/17/Java/elasticsearch/elasticsearch/mall_linux_deploy_09-1640797262306.png" alt="img"></p>
 <h2 id="ES的CURD操作"><a href="#ES的CURD操作" class="headerlink" title="ES的CURD操作"></a>ES的CURD操作</h2><p>PUT 类似于SQL中的增</p>
 <p>DELETE 类似于SQL中的删</p>
 <p>POST 类似于SQL中的改</p>
@@ -287,7 +281,8 @@
 <li><p>目标文档需要包含分词后的所有词</p>
 </li>
 <li><p>目标文档还要保持这些词的相对顺序和文档中的一致</p>
-<img src="/.io//12/17/Java/elasticsearch/elasticsearch/1640811134534.png" class width="1640811134534"></li>
+<p><img src="/2021/12/17/Java/elasticsearch/elasticsearch/1640811134534.png" alt="1640811134534"></p>
+</li>
 </ol>
 <figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span>        </span><br><span class="line">   		 <span class="attr">&quot;match_phrase&quot;</span><span class="punctuation">:</span><span class="punctuation">&#123;</span></span><br><span class="line">              <span class="attr">&quot;address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;mill lane&quot;</span>   </span><br><span class="line">         <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span>   </span><br></pre></td></tr></table></figure>
 
@@ -388,20 +383,10 @@
 <p>Elasticsearch 用于检索数据</p>
 <p>logstach：存储数据</p>
 <p>Kiban:视图化查看数据</p>
-<h1 id="其他不常用"><a href="#其他不常用" class="headerlink" title="其他不常用"></a>其他不常用</h1><h2 id="es的扁平化处理"><a href="#es的扁平化处理" class="headerlink" title="es的扁平化处理"></a>es的扁平化处理</h2><img src="/.io//12/17/Java/elasticsearch/elasticsearch/1641213328426.png" class width="1641213328426">
-
-
-
-
-
+<h1 id="其他不常用"><a href="#其他不常用" class="headerlink" title="其他不常用"></a>其他不常用</h1><h2 id="es的扁平化处理"><a href="#es的扁平化处理" class="headerlink" title="es的扁平化处理"></a>es的扁平化处理</h2><p><img src="/2021/12/17/Java/elasticsearch/elasticsearch/1641213328426.png" alt="1641213328426"></p>
 <p>数组里面都是对象的时候 使用嵌入式的属性</p>
 <p>设置对象的类型为嵌入式</p>
-<img src="/.io//12/17/Java/elasticsearch/elasticsearch/1641213517188.png" class width="1641213517188">
-
-
-
-
-
+<p><img src="/2021/12/17/Java/elasticsearch/elasticsearch/1641213517188.png" alt="1641213517188"></p>
 <h2 id="ES的IK分词器使用案例"><a href="#ES的IK分词器使用案例" class="headerlink" title="ES的IK分词器使用案例"></a>ES的IK分词器使用案例</h2><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line">#创建索引并添加映射</span><br><span class="line">PUT /account</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;mappings&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;properties&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">        <span class="attr">&quot;user&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;search_analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;search_analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="attr">&quot;desc&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">          <span class="attr">&quot;type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;text&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span><span class="punctuation">,</span></span><br><span class="line">          <span class="attr">&quot;search_analyzer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ik_max_word&quot;</span></span><br><span class="line">        <span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  </span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line">#获取索引映射</span><br><span class="line">GET account/_mapping</span><br><span class="line"></span><br><span class="line">#添加数据</span><br><span class="line">POST /account/_doc</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;desc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;数据库管理工程师&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;title&quot;</span><span class="punctuation">:</span> <span class="string">&quot;工程师&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;user&quot;</span><span class="punctuation">:</span> <span class="string">&quot;张三&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line">#进行分词</span><br><span class="line">GET _analyze/</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;analyzer&quot;</span><span class="punctuation">:</span><span class="string">&quot;ik_max_word&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;text&quot;</span><span class="punctuation">:</span><span class="string">&quot;数据库管理&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">#查询</span><br><span class="line">POST /account/_search</span><br><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;match&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;desc&quot;</span><span class="punctuation">:</span> <span class="string">&quot;管理&quot;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
@@ -411,8 +396,7 @@
 <h2 id="特殊类型-数据范围"><a href="#特殊类型-数据范围" class="headerlink" title="特殊类型 数据范围"></a>特殊类型 <strong>数据范围</strong></h2><p>范围类型(range)是es中比较具有<strong>特色</strong>的数据类型。下面我们就先来看看官方对其的定义。</p>
 <p><strong>定义</strong></p>
 <p>数字范围类数据。主要类型及范围如下。</p>
-<img src="/.io//12/17/Java/elasticsearch/elasticsearch/20200307191836851-1640809100676.png" class title="在这里插入图片描述">
-
+<p><img src="/2021/12/17/Java/elasticsearch/elasticsearch/20200307191836851-1640809100676.png" alt="在这里插入图片描述"></p>
 <p><strong>数据范围类型的使用</strong></p>
 <p><strong>映射定义</strong></p>
 <p>假设我们有一张会议表。我们知道实际中党政机关会议都有一个出席率的问题，需要出席率在某个点或某个区间内才能算作是有效的。所以我们的映射结构来了。</p>

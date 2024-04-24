@@ -102,18 +102,18 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h1 id="Gateway的使用"><a href="#Gateway的使用" class="headerlink" title="Gateway的使用"></a>Gateway的使用</h1><h2 id="1-什么是-API-网关（API-Gateway）"><a href="#1-什么是-API-网关（API-Gateway）" class="headerlink" title="1. 什么是 API 网关（API Gateway）"></a>1. 什么是 API 网关（API Gateway）</h2><img src="/.io//aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjAzMjUwMjEucG5n" alt="img" style="zoom:50%;">
+  <h1 id="Gateway的使用"><a href="#Gateway的使用" class="headerlink" title="Gateway的使用"></a>Gateway的使用</h1><h2 id="1-什么是-API-网关（API-Gateway）"><a href="#1-什么是-API-网关（API-Gateway）" class="headerlink" title="1. 什么是 API 网关（API Gateway）"></a>1. 什么是 API 网关（API Gateway）</h2><img src="/2021/03/18/Java/SpringCloud/Gateway%E7%9A%84%E4%BD%BF%E7%94%A8/aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjAzMjUwMjEucG5n" alt="img" style="zoom:50%;">
 
-<h3 id="API-网关的分类与功能"><a href="#API-网关的分类与功能" class="headerlink" title="API 网关的分类与功能"></a>API 网关的分类与功能</h3><img src="/.io//aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjAzNTQ5NTcucG5n" alt="img" style="zoom: 50%;">
+<h3 id="API-网关的分类与功能"><a href="#API-网关的分类与功能" class="headerlink" title="API 网关的分类与功能"></a>API 网关的分类与功能</h3><img src="/2021/03/18/Java/SpringCloud/Gateway%E7%9A%84%E4%BD%BF%E7%94%A8/aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjAzNTQ5NTcucG5n" alt="img" style="zoom: 50%;">
 
 <h2 id="2-Gateway是什么"><a href="#2-Gateway是什么" class="headerlink" title="2. Gateway是什么"></a>2. Gateway是什么</h2><blockquote>
 <p>Spring Cloud Gateway是Spring官方基于Spring 5.0，Spring Boot 2.0和Project Reactor等技术开发的网关，Spring Cloud Gateway旨在为微服务架构提供一种简单而有效的统一的API路由管理方式。Spring Cloud Gateway作为Spring Cloud生态系中的网关，目标是替代ZUUL，其不仅提供统一的路由方式，并且基于Filter链的方式提供了网关基本的功能，例如：安全，监控&#x2F;埋点，和限流等。</p>
 </blockquote>
 <h2 id="3-为什么用Gateway"><a href="#3-为什么用Gateway" class="headerlink" title="3. 为什么用Gateway"></a>3. 为什么用Gateway</h2><p>Spring Cloud Gateway 可以看做是一个 Zuul 1.x 的升级版和代替品，比 Zuul 2 更早的使用 Netty 实现异步 IO，从而实现了一个简单、比 Zuul 1.x 更高效的、与 Spring Cloud 紧密配合的 API 网关。<br>Spring Cloud Gateway 里明确的区分了 Router 和 Filter，并且一个很大的特点是内置了非常多的开箱即用功能，并且都可以通过 SpringBoot 配置或者手工编码链式调用来使用。<br>比如内置了 10 种 Router，使得我们可以直接配置一下就可以随心所欲的根据 Header、或者 Path、或者 Host、或者 Query 来做路由。<br>比如区分了一般的 Filter 和全局 Filter，内置了 20 种 Filter 和 9 种全局 Filter，也都可以直接用。当然自定义 Filter 也非常方便。</p>
-<h3 id="最重要的几个概念"><a href="#最重要的几个概念" class="headerlink" title="最重要的几个概念"></a>最重要的几个概念</h3><img src="/.io//aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjA3MTM4MjIucG5n" alt="img" style="zoom:67%;">
+<h3 id="最重要的几个概念"><a href="#最重要的几个概念" class="headerlink" title="最重要的几个概念"></a>最重要的几个概念</h3><img src="/2021/03/18/Java/SpringCloud/Gateway%E7%9A%84%E4%BD%BF%E7%94%A8/aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjA3MTM4MjIucG5n" alt="img" style="zoom:67%;">
 
-<p><img src="/.io//aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjA4MDkxNDYucG5n" alt="img"></p>
-<img src="/.io//aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjA4MjU3MzEucG5n" alt="img" style="zoom:80%;">
+<p><img src="/2021/03/18/Java/SpringCloud/Gateway%E7%9A%84%E4%BD%BF%E7%94%A8/aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjA4MDkxNDYucG5n" alt="img"></p>
+<img src="/2021/03/18/Java/SpringCloud/Gateway%E7%9A%84%E4%BD%BF%E7%94%A8/aHR0cDovL2Nvcy5yYWluMTAyNC5jb20vbWFya2Rvd24vaW1hZ2UtMjAxOTEwMDgxNjA4MjU3MzEucG5n" alt="img" style="zoom:80%;">
 
 <h2 id="4-Gateway怎么用"><a href="#4-Gateway怎么用" class="headerlink" title="4. Gateway怎么用"></a>4. Gateway怎么用</h2><p>说白了 Predicate 就是为了实现一组<strong>匹配规则</strong>，方便让请求过来找到对应的 Route 进行处理，接下来我们接下 Spring Cloud GateWay 内置几种 Predicate 的使用。</p>
 <h3 id="通过时间匹配"><a href="#通过时间匹配" class="headerlink" title="通过时间匹配"></a>通过时间匹配</h3><p>Predicate 支持设置一个时间，在请求进行转发的时候，可以通过判断在这个时间之前或者之后进行转发。比如我们现在设置只有在 2019 年 1 月 1 日才会转发到我的网站，在这之前不进行转发，我就可以这样配置：</p>

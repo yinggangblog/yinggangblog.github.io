@@ -121,61 +121,55 @@
 <h2 id="IDEA集成Git"><a href="#IDEA集成Git" class="headerlink" title="IDEA集成Git"></a>IDEA集成Git</h2><h3 id="1IDEA中配置Git-应用"><a href="#1IDEA中配置Git-应用" class="headerlink" title="1IDEA中配置Git(应用)"></a>1IDEA中配置Git(应用)</h3><ol>
 <li>File -&gt; Settings</li>
 </ol>
-
-
+<p><img src="/2021/05/12/Java/Git/git/64_IDEA%E4%B8%AD%E9%85%8D%E7%BD%AEGit.png" alt="64_IDEA中配置Git"></p>
 <ol start="2">
 <li>Version Control -&gt; Git -&gt; 指定git.exe存放目录</li>
 </ol>
-
-
+<p><img src="/2021/05/12/Java/Git/git/65_IDEA%E4%B8%AD%E9%85%8D%E7%BD%AEGit.png" alt="65_IDEA中配置Git"></p>
 <ol start="3">
 <li>点击Test测试</li>
 </ol>
-
-
+<p><img src="/2021/05/12/Java/Git/git/66_IDEA%E4%B8%AD%E9%85%8D%E7%BD%AEGit.png" alt="66_IDEA中配置Git"></p>
 <h3 id="2创建本地仓库-应用"><a href="#2创建本地仓库-应用" class="headerlink" title="2创建本地仓库(应用)"></a>2创建本地仓库(应用)</h3><ol>
 <li><p>VCS-&gt;Import into Version Control-&gt;Create Git Repository</p>
-
+<p><img src="/2021/05/12/Java/Git/git/67_%E5%88%9B%E5%BB%BA%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93.png" alt="67_创建本地仓库"></p>
 </li>
 <li><p>选择工程所在的目录,这样就创建好本地仓库了</p>
-
+<p><img src="/2021/05/12/Java/Git/git/68_%E5%88%9B%E5%BB%BA%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93.png" alt="68_创建本地仓库"></p>
 </li>
 <li><p>点击git后边的对勾,将当前项目代码提交到本地仓库</p>
 <p>注意: 项目中的配置文件不需要提交到本地仓库中,提交时,忽略掉即可</p>
+<p><img src="/2021/05/12/Java/Git/git/69_%E5%88%9B%E5%BB%BA%E6%9C%AC%E5%9C%B0%E4%BB%93%E5%BA%93.png" alt="69_创建本地仓库"></p>
 </li>
 </ol>
 <h3 id="3版本切换-应用"><a href="#3版本切换-应用" class="headerlink" title="3版本切换(应用)"></a>3版本切换(应用)</h3><ul>
 <li><p>方式一: 控制台Version Control-&gt;Log-&gt;Reset Current Branch…-&gt;Reset</p>
 <p>这种切换的特点是会抛弃原来的提交记录</p>
-
+<p><img src="/2021/05/12/Java/Git/git/70_%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2.png" alt="70_版本切换"></p>
 </li>
 <li><p>方式二:控制台Version Control-&gt;Log-&gt;Revert Commit-&gt;Merge-&gt;处理代码-&gt;commit</p>
 <p>这种切换的特点是会当成一个新的提交记录,之前的提交记录也都保留</p>
-
-
-
-
-<p>​		</p>
+<p><img src="/2021/05/12/Java/Git/git/71_%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2.png" alt="71_版本切换"></p>
+<p><img src="/2021/05/12/Java/Git/git/72_%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2.png" alt="72_版本切换"></p>
+<p>​		<img src="/2021/05/12/Java/Git/git/73_%E7%89%88%E6%9C%AC%E5%88%87%E6%8D%A2.png" alt="73_版本切换"></p>
 </li>
 </ul>
 <h3 id="4分支管理-应用"><a href="#4分支管理-应用" class="headerlink" title="4分支管理(应用)"></a>4分支管理(应用)</h3><ul>
 <li><p>创建分支</p>
 <p>VCS-&gt;Git-&gt;Branches-&gt;New Branch-&gt;给分支起名字-&gt;ok</p>
-
+<p><img src="/2021/05/12/Java/Git/git/74_%E5%88%9B%E5%BB%BA%E5%88%86%E6%94%AF.png" alt="74_创建分支"></p>
 </li>
 <li><p>切换分支</p>
 <p>idea右下角Git-&gt;选择要切换的分支-&gt;checkout</p>
-
+<p><img src="/2021/05/12/Java/Git/git/75_%E5%88%87%E6%8D%A2%E5%88%86%E6%94%AF.png" alt="75_切换分支"></p>
 </li>
 <li><p>合并分支</p>
 <p>VCS-&gt;Git-&gt;Merge changes-&gt;选择要合并的分支-&gt;merge</p>
-
-
+<p><img src="/2021/05/12/Java/Git/git/76_%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF.png" alt="76_合并分支"></p>
 <p>处理分支中的代码</p>
-
-
-
-
+<p><img src="/2021/05/12/Java/Git/git/77_%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF.png" alt="77_合并分支"></p>
+<p><img src="/2021/05/12/Java/Git/git/78_%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF.png" alt="78_合并分支"></p>
+<p><img src="/2021/05/12/Java/Git/git/79_%E5%90%88%E5%B9%B6%E5%88%86%E6%94%AF.png" alt="79_合并分支"></p>
 </li>
 </ul>
 <h2 id="关于idea-git中soft-mixed-hard-keep的区别"><a href="#关于idea-git中soft-mixed-hard-keep的区别" class="headerlink" title="关于idea git中soft mixed hard keep的区别"></a>关于idea git中soft mixed hard keep的区别</h2><h4 id="1、hard"><a href="#1、hard" class="headerlink" title="1、hard"></a>1、hard</h4><p>①移动本地库HEAD指针</p>

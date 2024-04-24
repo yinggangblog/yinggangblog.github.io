@@ -143,10 +143,7 @@
 </li>
 </ul>
 <p>选择右上角添加配置</p>
-<img src="/.io//09/11/Java/SpringCloud%20Alibaba/nacos/image-20220122002132321.png" class title="image-20220122002132321">
-
-
-
+<p><img src="/2021/09/11/Java/SpringCloud%20Alibaba/nacos/image-20220122002132321.png" alt="image-20220122002132321"></p>
 <h4 id="4、在应用中使用-Value-和-RefreshScope"><a href="#4、在应用中使用-Value-和-RefreshScope" class="headerlink" title="4、在应用中使用@Value 和 @RefreshScope"></a>4、在应用中使用@Value 和 @RefreshScope</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RefreshScope</span> <span class="comment">// 刷新对应controller</span></span><br><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;coupon/coupon&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CouponController</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> CouponService couponService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;coupon.user.name&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;coupon.user.age&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> Integer age;</span><br><span class="line">    <span class="meta">@RequestMapping(&quot;/test&quot;)</span></span><br><span class="line">    <span class="keyword">public</span> R <span class="title function_">test</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> R.ok().put(<span class="string">&quot;name&quot;</span>,name).put(<span class="string">&quot;age&quot;</span>,age);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 
@@ -159,12 +156,7 @@
 <p>Nacos 中的一组配置集，是组织配置的维度之一，通过一个有意义的字符串，(如 Buy 或 Trade ) 对配置集进行分组，从而区分 Data ID 相同的配置集，当您在 Nacos 上创建一个配置时，如果未填写配置分组的名称，则配置分组的名称默认采用，DEFAULT_GROUP 配置分组的常见场景，不同的应用或组件采用了相同的配置类型，如 database_url 配置和 MQ_topic 配置</p>
 <p><strong>命名空间:</strong><br>用于进行租户粒度的配置隔离。不同的命名空间下，可以存在相同的 <strong>Group</strong> 或 <strong>DatalD</strong> 的配置。<strong>Namespace</strong>  的常用场景之一是不同环境的配置的区分隔离，例如开发测试环境和生产环境的资源(如配置、服务)隔离等。</p>
 <p>开发 测试 生产 利用命名空间来做环境隔离</p>
-<img src="/.io//09/11/Java/SpringCloud%20Alibaba/nacos/image-20220122002400840.png" class title="image-20220122002400840">
-
-
-
-
-
+<p><img src="/2021/09/11/Java/SpringCloud%20Alibaba/nacos/image-20220122002400840.png" alt="image-20220122002400840"></p>
  
       <!-- reward -->
       
