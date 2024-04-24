@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"cardioid.gitee.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="认证登录的时候会随机生成验证码，如何把这个验证码和当前用户对应起来，实现验证码的校验呢？     依赖123456&lt;!-- Kaptcha 生成随机字符、生成图片（生成用于验证码）--&gt;&lt;dependency&gt;    &lt;groupId&gt;com.github.penggle&lt;&#x2F;groupId&gt;    &lt;artifactId&gt;kaptcha&amp;">
+<meta property="og:type" content="article">
+<meta property="og:title" content="登录的实现">
+<meta property="og:url" content="http://cardioid.gitee.io/2021/01/24/Java/%E7%99%BB%E9%99%86/%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/index.html">
+<meta property="og:site_name" content="WangYingGangBlogs">
+<meta property="og:description" content="认证登录的时候会随机生成验证码，如何把这个验证码和当前用户对应起来，实现验证码的校验呢？     依赖123456&lt;!-- Kaptcha 生成随机字符、生成图片（生成用于验证码）--&gt;&lt;dependency&gt;    &lt;groupId&gt;com.github.penggle&lt;&#x2F;groupId&gt;    &lt;artifactId&gt;kaptcha&amp;">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://cardioid.gitee.io/2021/01/24/Java/%E7%99%BB%E9%99%86/%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/640">
+<meta property="og:image" content="http://cardioid.gitee.io/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032154625.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032540830.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032701375.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032813459.png">
+<meta property="article:published_time" content="2021-01-24T13:11:18.000Z">
+<meta property="article:modified_time" content="2022-04-10T16:57:40.000Z">
+<meta property="article:author" content="WangYingGangBlogs">
+<meta property="article:tag" content="代码">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cardioid.gitee.io/2021/01/24/Java/%E7%99%BB%E9%99%86/%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/640">
+
+<link rel="canonical" href="http://cardioid.gitee.io/2021/01/24/Java/%E7%99%BB%E9%99%86/%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>登录的实现 | WangYingGangBlogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">WangYingGangBlogs</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://cardioid.gitee.io/2021/01/24/Java/%E7%99%BB%E9%99%86/%E5%AE%9E%E7%8E%B0%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="WangYingGangBlogs">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WangYingGangBlogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          登录的实现
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-01-24 21:11:18" itemprop="dateCreated datePublished" datetime="2021-01-24T21:11:18+08:00">2021-01-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-11 00:57:40" itemprop="dateModified" datetime="2022-04-11T00:57:40+08:00">2022-04-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E4%BB%A3%E7%A0%81/" itemprop="url" rel="index"><span itemprop="name">代码</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="认证"><a href="#认证" class="headerlink" title="认证"></a>认证</h1><p>登录的时候会随机生成验证码，如何把这个验证码和当前用户对应起来，实现验证码的校验呢？</p>
+<img src="%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/640" alt="图片" style="zoom:50%;" />
+
+
+
+<h2 id="依赖"><a href="#依赖" class="headerlink" title="依赖"></a>依赖</h2><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- Kaptcha 生成随机字符、生成图片（生成用于验证码）--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.github.penggle<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>kaptcha<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.3.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="获取验证码"><a href="#获取验证码" class="headerlink" title="获取验证码"></a>获取验证码</h2><p>显然，由于这个时候用户还没有登录，我们是没有办法通过用户的 id 来唯一的对应它的验证码的。</p>
+<p>所以这个时候我们考虑生成一个随机的 id 来暂时的代替这个用户，将其和对应的验证码<strong>暂时</strong>存入 Redis 中（60s）。并且在 Cookie 中暂时存一份为这个用户生成的随机 id（60s）。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 生成验证码, 并存入 Redis</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> response</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@GetMapping(&quot;/kaptcha&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">getKaptcha</span><span class="params">(HttpServletResponse response)</span> &#123;</span><br><span class="line">    <span class="comment">// 生成验证码</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">text</span> <span class="operator">=</span> kaptchaProducer.createText(); <span class="comment">// 生成随机字符 谷歌包下的</span></span><br><span class="line">    System.out.println(<span class="string">&quot;验证码：&quot;</span> + text);</span><br><span class="line">    <span class="type">BufferedImage</span> <span class="variable">image</span> <span class="operator">=</span> kaptchaProducer.createImage(text); <span class="comment">// 生成图片</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">// 验证码的归属者</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">kaptchaOwner</span> <span class="operator">=</span> UUID.randomUUID().toString().replaceAll(<span class="string">&quot;-&quot;</span>, <span class="string">&quot;&quot;</span>);</span><br><span class="line">    <span class="type">Cookie</span> <span class="variable">cookie</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Cookie</span>(<span class="string">&quot;kaptchaOwner&quot;</span>, kaptchaOwner);</span><br><span class="line">    cookie.setMaxAge(<span class="number">60</span>);</span><br><span class="line">    <span class="comment">//contextPath  项目访问路径 http://localhost:8080/</span></span><br><span class="line">    cookie.setPath(contextPath);</span><br><span class="line">    response.addCookie(cookie);</span><br><span class="line">    <span class="comment">//加层包装  &quot;kaptcha:&quot;</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> RedisKeyUtil.getKaptchaKey(kaptchaOwner);</span><br><span class="line">    <span class="comment">// 将验证码存入 redis</span></span><br><span class="line">    redisTemplate.opsForValue().set(redisKey, text, <span class="number">60</span>, TimeUnit.SECONDS);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将图片输出给浏览器</span></span><br><span class="line">    response.setContentType(<span class="string">&quot;image/png&quot;</span>);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="type">ServletOutputStream</span> <span class="variable">os</span> <span class="operator">=</span> response.getOutputStream();</span><br><span class="line">        ImageIO.write(image, <span class="string">&quot;png&quot;</span>, os);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        logger.error(<span class="string">&quot;响应验证码失败&quot;</span>, e.getMessage());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，当用户点击登录按钮后，就会去 Cookie 中获取这个随机 id，然后去 Redis 中查询对应的验证码，判断用户输入的验证码是否一致。</p>
+<h2 id="登陆"><a href="#登陆" class="headerlink" title="登陆"></a>登陆</h2><p>解释一下，每个用户登录成功后，我们都会为其生成一个随机的唯一的登录凭证实体类对象 <code>LoginTicket</code>（包含用户 id、登录凭证字符串 ticket、是否有效、过期时间）</p>
+<p>我们把这个登录凭证实体类对象 存储在 Redis 中（key 就是登录凭证字符串 ticket）</p>
+<p>而所谓登录凭证的无效，就是指用户登出后，这个凭证就会被设置为无效状态；凭证的默认过期时间是 1000s。这段代码在 <code>UserService</code> 中：</p>
+<p>并且，我们在 Cookie 中也同样存储了一份登录凭证的字符串 ticket，过期时间和 Redis 中的是一样的。点击记住我可以延长过期时间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 用户登录</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> username 用户名</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> password 密码</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> code 验证码</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> rememberMe 是否记住我（点击记住我后，凭证的有效期延长）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> model</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> kaptchaOwner 从 cookie 中取出的 kaptchaOwner</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> response</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@PostMapping(&quot;/login&quot;)</span></span><br><span class="line"><span class="keyword">public</span> String <span class="title function_">login</span><span class="params">(<span class="meta">@RequestParam(&quot;username&quot;)</span> String username,</span></span><br><span class="line"><span class="params">                    <span class="meta">@RequestParam(&quot;password&quot;)</span> String password,</span></span><br><span class="line"><span class="params">                    <span class="meta">@RequestParam(&quot;code&quot;)</span> String code,</span></span><br><span class="line"><span class="params">                    <span class="meta">@RequestParam(value = &quot;rememberMe&quot;, required = false)</span> <span class="type">boolean</span> rememberMe,</span></span><br><span class="line"><span class="params">                    Model model, HttpServletResponse response,</span></span><br><span class="line"><span class="params">                    <span class="meta">@CookieValue(&quot;kaptchaOwner&quot;)</span> String kaptchaOwner)</span> &#123;</span><br><span class="line">    <span class="comment">// 检查验证码</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">kaptcha</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isNotBlank(kaptchaOwner)) &#123;</span><br><span class="line">        <span class="comment">//不是空的话进行获取</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> RedisKeyUtil.getKaptchaKey(kaptchaOwner);</span><br><span class="line">        kaptcha = (String) redisTemplate.opsForValue().get(redisKey);</span><br><span class="line">    &#125;</span><br><span class="line">	<span class="comment">//判断传入的跟获取的是否是一样</span></span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(kaptcha) || StringUtils.isBlank(code) || !kaptcha.equalsIgnoreCase(code)) &#123;</span><br><span class="line">        model.addAttribute(<span class="string">&quot;codeMsg&quot;</span>, <span class="string">&quot;验证码错误&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;/site/login&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 凭证过期时间（是否记住我）</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">expiredSeconds</span> <span class="operator">=</span> rememberMe ? REMEMBER_EXPIRED_SECONDS : DEFAULT_EXPIRED_SECONDS;</span><br><span class="line">    <span class="comment">// 验证用户名和密码</span></span><br><span class="line">    Map&lt;String, Object&gt; map = userService.login(username, password, expiredSeconds);</span><br><span class="line">    <span class="keyword">if</span> (map.containsKey(<span class="string">&quot;ticket&quot;</span>)) &#123;</span><br><span class="line">        <span class="comment">// 账号和密码均正确，则服务端会生成 ticket，浏览器通过 cookie 存储 ticket</span></span><br><span class="line">        <span class="type">Cookie</span> <span class="variable">cookie</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Cookie</span>(<span class="string">&quot;ticket&quot;</span>, map.get(<span class="string">&quot;ticket&quot;</span>).toString());</span><br><span class="line">        cookie.setPath(contextPath); <span class="comment">// cookie 有效范围</span></span><br><span class="line">        cookie.setMaxAge(expiredSeconds);</span><br><span class="line">        response.addCookie(cookie);</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;redirect:/index&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        model.addAttribute(<span class="string">&quot;usernameMsg&quot;</span>, map.get(<span class="string">&quot;usernameMsg&quot;</span>));</span><br><span class="line">        model.addAttribute(<span class="string">&quot;passwordMsg&quot;</span>, map.get(<span class="string">&quot;passwordMsg&quot;</span>));</span><br><span class="line">        <span class="keyword">return</span> <span class="string">&quot;/site/login&quot;</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>&#x2F;&#x2F;OK，用户输入用户名和密码并且校验完验证码之后，就登录成功了，那我们如何在一次请求中去保存这个用户的状态？如何回显用户的信息呢？<br>&#x2F;&#x2F;设计了一个 LoginTicket 类</p>
+<p>&#x2F;&#x2F;用户登陆的login</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 用户登录（为用户创建凭证）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> username</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> password</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> expiredSeconds 多少秒后凭证过期</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span> Map&lt;String, Object&gt; 返回错误提示消息以及 ticket(凭证)</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title function_">login</span><span class="params">(String username, String password, <span class="type">int</span> expiredSeconds)</span> &#123;</span><br><span class="line">    Map&lt;String, Object&gt; map = <span class="keyword">new</span> <span class="title class_">HashMap</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 空值处理</span></span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(username)) &#123;</span><br><span class="line">        map.put(<span class="string">&quot;usernameMsg&quot;</span>, <span class="string">&quot;账号不能为空&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (StringUtils.isBlank(password)) &#123;</span><br><span class="line">        map.put(<span class="string">&quot;passwordMsg&quot;</span>, <span class="string">&quot;密码不能为空&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 验证账号</span></span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userMapper.selectByName(username);</span><br><span class="line">    <span class="keyword">if</span> (user == <span class="literal">null</span>) &#123;</span><br><span class="line">        map.put(<span class="string">&quot;usernameMsg&quot;</span>, <span class="string">&quot;该账号不存在&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 验证状态</span></span><br><span class="line">    <span class="keyword">if</span> (user.getStatus() == <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="comment">// 账号未激活</span></span><br><span class="line">        map.put(<span class="string">&quot;usernameMsg&quot;</span>, <span class="string">&quot;该账号未激活&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 验证密码</span></span><br><span class="line">    password = CommunityUtil.md5(password + user.getSalt());</span><br><span class="line">    <span class="keyword">if</span> (!user.getPassword().equals(password)) &#123;</span><br><span class="line">        map.put(<span class="string">&quot;passwordMsg&quot;</span>, <span class="string">&quot;密码错误&quot;</span>);</span><br><span class="line">        <span class="keyword">return</span> map;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 用户名和密码均正确，为该用户生成登录凭证</span></span><br><span class="line">    <span class="type">LoginTicket</span> <span class="variable">loginTicket</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">LoginTicket</span>();</span><br><span class="line">    loginTicket.setUserId(user.getId());</span><br><span class="line">    loginTicket.setTicket(CommunityUtil.generateUUID()); <span class="comment">// 随机凭证</span></span><br><span class="line">    loginTicket.setStatus(<span class="number">0</span>); <span class="comment">// 设置凭证状态为有效（当用户登出的时候，设置凭证状态为无效）</span></span><br><span class="line">    loginTicket.setExpired(<span class="keyword">new</span> <span class="title class_">Date</span>(System.currentTimeMillis() + expiredSeconds * <span class="number">1000</span>)); <span class="comment">// 设置凭证到期时间</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">// 将登录凭证存入 redis</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> RedisKeyUtil.getTicketKey(loginTicket.getTicket());</span><br><span class="line">    redisTemplate.opsForValue().set(redisKey, loginTicket);</span><br><span class="line"></span><br><span class="line">    map.put(<span class="string">&quot;ticket&quot;</span>, loginTicket.getTicket());</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> map;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">LoginTicket</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> id;</span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> userId;</span><br><span class="line">    <span class="keyword">private</span> String ticket; <span class="comment">// 凭证</span></span><br><span class="line">    <span class="keyword">private</span> <span class="type">int</span> status; <span class="comment">// 状态（是否有效）</span></span><br><span class="line">    <span class="keyword">private</span> Date expired; <span class="comment">// 过期时间</span></span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="拦截器"><a href="#拦截器" class="headerlink" title="拦截器"></a>拦截器</h2><p>OK，存储完 <code>LoginTicket</code> 后，我们就可以根据它来获取用户的状态了。我们定义了一个拦截器 <code>LoginTicketInterceptor</code>，<strong>每次请求之前都会从 Cookie 获取到 ticket，然后根据 ticket 去 Redis 中查看这个用户的登录凭证 <code>LoginTicket</code> 是否过期和是否有效</strong>，只有登录凭证有效且没有过期才会执行请求，不然就会跳转到登录界面。</p>
+<p>在 Controller 执行之前被调用<br> 检查凭证状态，若凭证有效则在本次请求中持有该用户信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.greate.community.controller.interceptor;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.greate.community.entity.LoginTicket;</span><br><span class="line"><span class="keyword">import</span> com.greate.community.entity.User;</span><br><span class="line"><span class="keyword">import</span> com.greate.community.service.UserService;</span><br><span class="line"><span class="keyword">import</span> com.greate.community.util.CookieUtil;</span><br><span class="line"><span class="keyword">import</span> com.greate.community.util.HostHolder;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.authentication.UsernamePasswordAuthenticationToken;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.Authentication;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.context.SecurityContextHolder;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.context.SecurityContextImpl;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.HandlerInterceptor;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.servlet.ModelAndView;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">LoginTicketInterceptor</span> <span class="keyword">implements</span> <span class="title class_">HandlerInterceptor</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> UserService userService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> HostHolder hostHolder;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 在 Controller 执行之前被调用</span></span><br><span class="line"><span class="comment">     * 检查凭证状态，若凭证有效则在本次请求中持有该用户信息</span></span><br><span class="line"><span class="comment">     * 1）在 Controller 执行之前：检查登录凭证状态，若登录凭证有效且未过期则在本次请求中持有该用户信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">boolean</span> <span class="title function_">preHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="comment">// 从 cookie 中获取凭证</span></span><br><span class="line">        <span class="type">String</span> <span class="variable">ticket</span> <span class="operator">=</span> CookieUtil.getValue(request, <span class="string">&quot;ticket&quot;</span>);</span><br><span class="line">        <span class="keyword">if</span> (ticket != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="comment">// 查询凭证</span></span><br><span class="line">            <span class="type">LoginTicket</span> <span class="variable">loginTicket</span> <span class="operator">=</span> userService.findLoginTicket(ticket);</span><br><span class="line">            </span><br><span class="line">            <span class="comment">// 检查凭证状态（是否有效）以及是否过期</span></span><br><span class="line">            <span class="keyword">if</span> (loginTicket != <span class="literal">null</span> &amp;&amp; loginTicket.getStatus() == <span class="number">0</span> &amp;&amp; loginTicket.getExpired().after(<span class="keyword">new</span> <span class="title class_">Date</span>())) &#123;</span><br><span class="line">                <span class="comment">// 根据凭证查询用户</span></span><br><span class="line">                <span class="comment">//这里有一个点我们进行了稍微的优化。就是我们的拦截器在每次请求前通过 Cookie 去 Redis 中查询登录凭证 LoginTicket </span></span><br><span class="line">                <span class="comment">//然后获取到用户 id 后，需要去数据库中查询用户信息，然后才能在本次请求中持有用户信息。</span></span><br><span class="line">                <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userService.findUserById(loginTicket.getUserId());</span><br><span class="line">                <span class="comment">// 在本次请求中持有用户信息</span></span><br><span class="line">                hostHolder.setUser(user);</span><br><span class="line"></span><br><span class="line">                <span class="comment">// 认证的话上面大家也看到了，是我们自己写的逻辑，跳过了 Spring Security，那我们就需要把我们自己做的逻辑认证的结果存入 SecurityContext，以便于 Spring Security 进行授权</span></span><br><span class="line">                <span class="type">Authentication</span> <span class="variable">authentication</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">UsernamePasswordAuthenticationToken</span>(</span><br><span class="line">                        user, user.getPassword(), userService.getAuthorities(user.getId())</span><br><span class="line">                );</span><br><span class="line">                SecurityContextHolder.setContext(<span class="keyword">new</span> <span class="title class_">SecurityContextImpl</span>(authentication));</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 2）在模板引擎之前：将用户信息存入 modelAndView，便于模板引擎调用</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">postHandle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> hostHolder.getUser();</span><br><span class="line">        <span class="keyword">if</span> (user != <span class="literal">null</span> &amp;&amp; modelAndView != <span class="literal">null</span>) &#123;</span><br><span class="line">            modelAndView.addObject(<span class="string">&quot;loginUser&quot;</span>, user);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 3）在 Controller 执行之后（即服务端对本次请求做出响应后）：清理本次请求持有的用户信息（也就是 ThreadLocal 的 remove，如果没有即时 remove 会导致 OOM）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">afterCompletion</span><span class="params">(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        hostHolder.clear();</span><br><span class="line">        SecurityContextHolder.clearContext();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+<p>从 request 中获取指定 name 的 cookie</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.greate.community.util;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.Cookie;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CookieUtil</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 从 request 中获取指定 name 的 cookie</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> String <span class="title function_">getValue</span><span class="params">(HttpServletRequest request, String name)</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (request == <span class="literal">null</span> || name == <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;参数为空&quot;</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        Cookie[] cookies = request.getCookies();</span><br><span class="line">        <span class="keyword">if</span>(cookies != <span class="literal">null</span>) &#123;</span><br><span class="line">            <span class="keyword">for</span>(Cookie cookie : cookies) &#123;</span><br><span class="line">                <span class="keyword">if</span> (cookie.getName().equals(name)) &#123;</span><br><span class="line">                    <span class="keyword">return</span> cookie.getValue();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> <span class="literal">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>根据 ticket 查询 LoginTicket 信息</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 根据 ticket 查询 LoginTicket 信息</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> ticket</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> LoginTicket <span class="title function_">findLoginTicket</span><span class="params">(String ticket)</span> &#123;</span><br><span class="line">    <span class="comment">// return loginTicketMapper.selectByTicket(ticket);</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> RedisKeyUtil.getTicketKey(ticket);</span><br><span class="line">    <span class="keyword">return</span> (LoginTicket) redisTemplate.opsForValue().get(redisKey);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>关于拦截器做的事情，我们来梳理一下：</p>
+<p>1）在 Controller 执行之前：检查登录凭证状态，若登录凭证有效且未过期则在本次请求中持有该用户信息</p>
+<p>2） Controller 执行之后：将用户信息存入 modelAndView，便于模板引擎调用</p>
+<p>3）在 Controller 执行之后（即服务端对本次请求做出响应后）：清理本次请求持有的用户信息（也就是 <code>ThreadLocal</code> 的 <code>remove</code>，如果没有即时 <code>remove</code> 会导致 OOM）</p>
+<p>如果该用户的登录凭证有效且没有过期，那我们就可以在本次请求中<strong>持有这个用户的信息</strong>了。</p>
+<p>如果持有呢？一般来说可以使用 Session，但是 Session 无法在分布式存储中发挥有效的作用。</p>
+<p>详细来说就是：客户端发送一个请求给服务器，经过负载均衡后该请求会被分发到集群中多个服务器中的其中一个，由于不同的服务器可能含有不同的 Web 服务器，而 Web 服务器之间并不能发现其他 Web 服务器中保存的 Session 信息，这样，它就会再次重新生成一个 JSESSIONID，导致之前的状态丢失。</p>
+<p>所以这里我们考虑使用 <code>ThreadLocal</code> 保存用户信息，<code>ThreadLocal</code> 在每个线程中都创建了一个用户信息副本，也就是说每个线程都可以访问自己内部的用户信息副本变量。</p>
+<p>来看下 <code>HostHolder</code> 类：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> com.greate.community.entity.User;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 持有用户信息(多线程)，用于代替 session 对象</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HostHolder</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ThreadLocal&lt;User&gt; users = <span class="keyword">new</span> <span class="title class_">ThreadLocal</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 存储 User</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        users.set(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取 User</span></span><br><span class="line">    <span class="keyword">public</span> User <span class="title function_">getUser</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> users.get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清理</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">clear</span><span class="params">()</span> &#123;</span><br><span class="line">        users.remove();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>显然，每次请求前都需要经过这个步骤，这个访问数据库的频率还是很频繁的。因此我们考虑把登录成功的用户信息在 Redis 中保存一会，拦截器每次查询前先去 Redis 中查询，如果 Redis 中没有再去查询数据库，然后写进 Redis。OK，我们来看看 <code>findUserById</code> 方法具体是怎么实现的：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 根据 Id 查询用户</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> id</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> User <span class="title function_">findUserById</span> <span class="params">(<span class="type">int</span> id)</span> &#123;</span><br><span class="line">    <span class="comment">// return userMapper.selectById(id);</span></span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> getCache(id); <span class="comment">// 优先从缓存中查询数据</span></span><br><span class="line">    <span class="keyword">if</span> (user == <span class="literal">null</span>) &#123;</span><br><span class="line">        user = initCache(id);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 优先从缓存中取值</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> User <span class="title function_">getCache</span><span class="params">(<span class="type">int</span> userId)</span> &#123;</span><br><span class="line">    <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> RedisKeyUtil.getUserKey(userId);</span><br><span class="line">    <span class="keyword">return</span> (User) redisTemplate.opsForValue().get(redisKey);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 缓存中没有该用户信息时，则将其存入缓存</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">private</span> User <span class="title function_">initCache</span><span class="params">(<span class="type">int</span> userId)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userMapper.selectById(userId);</span><br><span class="line">    <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> RedisKeyUtil.getUserKey(userId);</span><br><span class="line">    redisTemplate.opsForValue().set(redisKey, user, <span class="number">3600</span>, TimeUnit.SECONDS);</span><br><span class="line">    <span class="keyword">return</span> user;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>缓存和数据库的一致性问题的话，使用的是<strong>旁路缓存模式</strong>，也就是先更新数据库，然后直接删除缓存中的数据。比如对于修改用户密码、修改用户头像、激活用户后用户 status 的改变等，这些涉及数据库表中字段更新的操作，都需要删除缓存：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 修改用户头像</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> headUrl</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">updateHeader</span><span class="params">(<span class="type">int</span> userId, String headUrl)</span> &#123;</span><br><span class="line">    <span class="comment">// return userMapper.updateHeader(userId, headUrl);</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">rows</span> <span class="operator">=</span> userMapper.updateHeader(userId, headUrl);</span><br><span class="line">    clearCache(userId);</span><br><span class="line">    <span class="keyword">return</span> rows;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 修改用户密码（对新密码加盐加密存入数据库）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> newPassword 新密码</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">updatePassword</span><span class="params">(<span class="type">int</span> userId, String newPassword)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userMapper.selectById(userId);</span><br><span class="line">    <span class="comment">// 重新加盐加密</span></span><br><span class="line">    newPassword = CommunityUtil.md5(newPassword + user.getSalt());</span><br><span class="line">    clearCache(userId);</span><br><span class="line">    <span class="keyword">return</span> userMapper.updatePassword(userId, newPassword);</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 激活用户</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId 用户 id</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> code 激活码</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="type">int</span> <span class="title function_">activation</span><span class="params">(<span class="type">int</span> userId, String code)</span> &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> userMapper.selectById(userId);</span><br><span class="line">    <span class="keyword">if</span> (user.getStatus() == <span class="number">1</span>) &#123;</span><br><span class="line">        <span class="comment">// 用户已激活</span></span><br><span class="line">        <span class="keyword">return</span> ACTIVATION_REPEAT;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> <span class="keyword">if</span> (user.getActivationCode().equals(code)) &#123;</span><br><span class="line">        <span class="comment">// 修改用户状态为已激活</span></span><br><span class="line">        userMapper.updateStatus(userId, <span class="number">1</span>);</span><br><span class="line">        clearCache(userId); <span class="comment">// 用户信息变更，清除缓存中的旧数据</span></span><br><span class="line">        <span class="keyword">return</span> ACTIVATION_SUCCESS;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> ACTIVATION_FAILURE;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>可能有同学就会问了，<strong>为什么是直接删除缓存，而不是也相应的更新缓存呢</strong>？</p>
+<p>答案很简单，在多线程的环境下，假设线程 A 更新了数据库中的某个字段为 1，如果在线程 A 提交之前，线程 B 又修改了这个字段为 2 并且先于线程 A 做了提交，那么线程 A 接下来提交的数据就是脏数据。直接删除缓存可以避免这个问题。</p>
+<p>总的来说，这个认证流程是这样的：</p>
+<ul>
+<li>用户登录 —&gt; 生成登录凭证存入 Redis，Cookie 中存一份 key</li>
+<li>每次执行请求都会通过 Cookie 去 Redis 中查询该用户的登陆凭证是否过期和是否有效。点击记住我可以延长登录凭证的过期时间，用户退出则其登录凭证变为无效状态</li>
+<li>根据这个登录凭证对应的用户 id，去数据库中查询这个用户信息</li>
+<li>使用 ThreadLocal 在本次请求中一直持有这个用户信息</li>
+<li>优化点：每次请求前都需要去数据库查询这个用户信息，访问频率比较高，所以我们考虑把登录成功的用户信息在 Redis 中保存一会，拦截器每次查询前先去 Redis 中查询，然后缓存和数据库的一致性问题的话，使用的是旁路缓存模式，也就是先更新数据库，然后直接删除缓存中的数据。</li>
+</ul>
+<h1 id="授权"><a href="#授权" class="headerlink" title="授权"></a>授权</h1><p>认证的话上面大家也看到了，是我们自己写的逻辑，跳过了 Spring Security，那我们就需要把我们自己做的逻辑认证的结果存入 <code>SecurityContext</code>，以便于 Spring Security 进行授权：</p>
+<p><img src="/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032154625.png" alt="image-20220226032154625"></p>
+<p><code>getAuthorities</code> 就是从数据库中获取某个用户的权限（用户的权限&#x2F;类型 <code>type</code> 是存在数据库表中的）</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 获取某个用户的权限</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@return</span></span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> Collection&lt;? <span class="keyword">extends</span> <span class="title class_">GrantedAuthority</span>&gt; getAuthorities(<span class="type">int</span> userId) &#123;</span><br><span class="line">    <span class="type">User</span> <span class="variable">user</span> <span class="operator">=</span> <span class="built_in">this</span>.findUserById(userId);</span><br><span class="line">    List&lt;GrantedAuthority&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">    list.add(<span class="keyword">new</span> <span class="title class_">GrantedAuthority</span>() &#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="keyword">public</span> String <span class="title function_">getAuthority</span><span class="params">()</span> &#123;</span><br><span class="line">            <span class="keyword">switch</span> (user.getType()) &#123;</span><br><span class="line">                <span class="keyword">case</span> <span class="number">1</span>:</span><br><span class="line">                    <span class="keyword">return</span> AUTHORITY_ADMIN;</span><br><span class="line">                <span class="keyword">case</span> <span class="number">2</span>:</span><br><span class="line">                    <span class="keyword">return</span> AUTHORITY_MODERATOR;</span><br><span class="line">                <span class="keyword">default</span>:</span><br><span class="line">                    <span class="keyword">return</span> AUTHORITY_USER;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;);</span><br><span class="line">    <span class="keyword">return</span> list;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>自定义这些权限拥有访问哪些路径的权力，比如：</p>
+<p><img src="/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032540830.png" alt="image-20220226032540830"></p>
+<p>另外，还需要定义一下权限不够时需要做哪些处理，注意区分下异步请求和普通请求，对于异步请求我们返回一个 JSON 字符串，对于普通请求我们直接返回错误界面即可：</p>
+<p><img src="/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032701375.png" alt="image-20220226032701375"></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.greate.community.config;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.greate.community.util.CommunityConstant;</span><br><span class="line"><span class="keyword">import</span> com.greate.community.util.CommunityUtil;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.access.AccessDeniedException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.config.annotation.web.builders.HttpSecurity;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.config.annotation.web.builders.WebSecurity;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.core.AuthenticationException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.AuthenticationEntryPoint;</span><br><span class="line"><span class="keyword">import</span> org.springframework.security.web.access.AccessDeniedHandler;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletException;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletRequest;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.PrintWriter;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SecurityConfig</span> <span class="keyword">extends</span> <span class="title class_">WebSecurityConfigurerAdapter</span> <span class="keyword">implements</span> <span class="title class_">CommunityConstant</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 静态资源</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> web</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(WebSecurity web)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        web.ignoring().antMatchers(<span class="string">&quot;/resources/**&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 认证环节我们使用自己的代码 LoginController，绕过 Spring Security 的</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 授权</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> http</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@throws</span> Exception</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">void</span> <span class="title function_">configure</span><span class="params">(HttpSecurity http)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">        http.authorizeRequests()</span><br><span class="line">                .antMatchers(</span><br><span class="line">                    <span class="string">&quot;/user/setting&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/user/upload&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/discuss/add&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/discuss/publish&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/comment/add/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/letter/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/notice/**&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/like&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/follow&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/unfollow&quot;</span></span><br><span class="line">                )</span><br><span class="line">                .hasAnyAuthority(</span><br><span class="line">                        AUTHORITY_USER,</span><br><span class="line">                        AUTHORITY_ADMIN,</span><br><span class="line">                        AUTHORITY_MODERATOR</span><br><span class="line">                )</span><br><span class="line"></span><br><span class="line">                .antMatchers(</span><br><span class="line">                    <span class="string">&quot;/discuss/top&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/discuss/wonderful&quot;</span></span><br><span class="line">                )</span><br><span class="line">                .hasAnyAuthority(</span><br><span class="line">                        AUTHORITY_MODERATOR</span><br><span class="line">                )</span><br><span class="line"></span><br><span class="line">                .antMatchers(</span><br><span class="line">                        <span class="string">&quot;/discuss/delete&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/discuss/delete/&quot;</span>,</span><br><span class="line">                        <span class="string">&quot;/data/**&quot;</span></span><br><span class="line">                )</span><br><span class="line">                .hasAnyAuthority(</span><br><span class="line">                        AUTHORITY_ADMIN</span><br><span class="line">                )</span><br><span class="line"></span><br><span class="line">                .anyRequest().permitAll()</span><br><span class="line"></span><br><span class="line">                .and().csrf().disable();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 权限不够时的处理</span></span><br><span class="line">        http.exceptionHandling()</span><br><span class="line">                <span class="comment">// 1. 未登录时的处理</span></span><br><span class="line">                .authenticationEntryPoint(<span class="keyword">new</span> <span class="title class_">AuthenticationEntryPoint</span>() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">commence</span><span class="params">(HttpServletRequest request, HttpServletResponse response, AuthenticationException e)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">                        <span class="type">String</span> <span class="variable">xRequestedWith</span> <span class="operator">=</span> request.getHeader(<span class="string">&quot;x-requested-with&quot;</span>);</span><br><span class="line">                        <span class="keyword">if</span> (<span class="string">&quot;XMLHttpRequest&quot;</span>.equals(xRequestedWith)) &#123;</span><br><span class="line">                            <span class="comment">// 异步请求</span></span><br><span class="line">                            response.setContentType(<span class="string">&quot;application/plain;charset=utf-8&quot;</span>);</span><br><span class="line">                            <span class="type">PrintWriter</span> <span class="variable">writer</span> <span class="operator">=</span> response.getWriter();</span><br><span class="line">                            writer.write(CommunityUtil.getJSONString(<span class="number">403</span>, <span class="string">&quot;你还没有登录&quot;</span>));</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> &#123;</span><br><span class="line">                            <span class="comment">// 普通请求</span></span><br><span class="line">                            response.sendRedirect(request.getContextPath() + <span class="string">&quot;/login&quot;</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;)</span><br><span class="line">                <span class="comment">// 2. 权限不够时的处理</span></span><br><span class="line">                .accessDeniedHandler(<span class="keyword">new</span> <span class="title class_">AccessDeniedHandler</span>() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handle</span><span class="params">(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e)</span> <span class="keyword">throws</span> IOException, ServletException &#123;</span><br><span class="line">                        <span class="type">String</span> <span class="variable">xRequestedWith</span> <span class="operator">=</span> request.getHeader(<span class="string">&quot;x-requested-with&quot;</span>);</span><br><span class="line">                        <span class="keyword">if</span> (<span class="string">&quot;XMLHttpRequest&quot;</span>.equals(xRequestedWith)) &#123;</span><br><span class="line">                            <span class="comment">// 异步请求</span></span><br><span class="line">                            response.setContentType(<span class="string">&quot;application/plain;charset=utf-8&quot;</span>);</span><br><span class="line">                            <span class="type">PrintWriter</span> <span class="variable">writer</span> <span class="operator">=</span> response.getWriter();</span><br><span class="line">                            writer.write(CommunityUtil.getJSONString(<span class="number">403</span>, <span class="string">&quot;你没有访问该功能的权限&quot;</span>));</span><br><span class="line">                        &#125;</span><br><span class="line">                        <span class="keyword">else</span> &#123;</span><br><span class="line">                            <span class="comment">// 普通请求</span></span><br><span class="line">                            response.sendRedirect(request.getContextPath() + <span class="string">&quot;/denied&quot;</span>);</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Security 底层会默认拦截 /logout 请求，进行退出处理</span></span><br><span class="line">        <span class="comment">// 此处赋予它一个根本不存在的退出路径，使得程序能够执行到我们自己编写的退出代码</span></span><br><span class="line">        http.logout().logoutUrl(<span class="string">&quot;/securitylogout&quot;</span>);</span><br><span class="line"></span><br><span class="line">        http.headers().frameOptions().sameOrigin();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p>Spring Security 底层会默认拦截 <code>/logout</code> 请求，进行退出处理，由于退出的逻辑我们也自己实现了（将该用户的 <code>LoginTicket</code> 状态设置为无效）</p>
+<p>用户退出</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 用户退出（将凭证状态设为无效）</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> ticket</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">logout</span><span class="params">(String ticket)</span> &#123;</span><br><span class="line">    <span class="comment">// loginTicketMapper.updateStatus(ticket, 1);</span></span><br><span class="line">    <span class="comment">// 修改（先删除再插入）对应用户在 redis 中的凭证状态</span></span><br><span class="line">    <span class="type">String</span> <span class="variable">redisKey</span> <span class="operator">=</span> RedisKeyUtil.getTicketKey(ticket);</span><br><span class="line">    <span class="type">LoginTicket</span> <span class="variable">loginTicket</span> <span class="operator">=</span> (LoginTicket) redisTemplate.opsForValue().get(redisKey);</span><br><span class="line">    loginTicket.setStatus(<span class="number">1</span>);</span><br><span class="line">    redisTemplate.opsForValue().set(redisKey, loginTicket);</span><br><span class="line">&#125;</span><br><span class="line">SecurityContextHolder.clearContext();</span><br><span class="line"><span class="comment">//你好，每次请求处理完时要清空上下文，这个和threadlocal很相似，当前线程执行完清空上下文，避免内存泄漏等问题</span></span><br><span class="line"><span class="comment">//基于ThreadLocal的存储策略实现，看上去，这个类好像跟上面那个全局的没什么差别。但是要注意了，它是用ThreadLocal来存储的。新手可能会疑惑，就一个变量，我怎么存储多个上下文，这个变量又不是集合。</span></span><br><span class="line"><span class="comment">//这里就不分析源码了，实际上ThreadLocal内部会用数组来存储多个对象的。原理是，ThreadLocal会为每个线程开辟一个存储区域，来存储相应的对象。</span></span><br></pre></td></tr></table></figure>
+
+<p>所以我们赋予 Spring Security 一个根本不存在的退出路径，使得程序能够执行到我们自己编写的退出代码：</p>
+<p><img src="/%E5%9B%BE%E7%89%87%E9%AA%8C%E8%AF%81%E7%A0%81%E7%9A%84%E6%A0%A1%E9%AA%8C/image-20220226032813459.png" alt="image-20220226032813459"></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E4%BB%A3%E7%A0%81/" rel="tag"># 代码</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/21/Java/%E7%99%BB%E9%99%86/%E7%99%BB%E9%99%86/" rel="prev" title="登录的实现">
+      <i class="fa fa-chevron-left"></i> 登录的实现
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/02/01/Java/%E5%A4%9A%E7%BA%BF%E7%A8%8B/%E5%A4%9A%E7%BA%BF%E7%A8%8B/" rel="next" title="多线程">
+      多线程 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E8%AE%A4%E8%AF%81"><span class="nav-number">1.</span> <span class="nav-text">认证</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BE%9D%E8%B5%96"><span class="nav-number">1.1.</span> <span class="nav-text">依赖</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E9%AA%8C%E8%AF%81%E7%A0%81"><span class="nav-number">1.2.</span> <span class="nav-text">获取验证码</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%99%BB%E9%99%86"><span class="nav-number">1.3.</span> <span class="nav-text">登陆</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8B%A6%E6%88%AA%E5%99%A8"><span class="nav-number">1.4.</span> <span class="nav-text">拦截器</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%88%E6%9D%83"><span class="nav-number">2.</span> <span class="nav-text">授权</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">WangYingGangBlogs</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WangYingGangBlogs</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

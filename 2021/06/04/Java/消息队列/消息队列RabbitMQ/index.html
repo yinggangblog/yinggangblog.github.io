@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"cardioid.gitee.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="RabbitMQ安装 下载rabbitmq3.7.15的docker镜像：  1docker pull rabbitmq:3.7.15   使用如下命令启动RabbitMQ服务：  12docker run -p 5672:5672 -p 15672:15672 --name rabbitmq \-d rabbitmq:3.7.15   进入容器并开启管理功能：  12docker exec -i">
+<meta property="og:type" content="article">
+<meta property="og:title" content="RabbitMQ消息队列">
+<meta property="og:url" content="http://cardioid.gitee.io/2021/06/04/Java/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/index.html">
+<meta property="og:site_name" content="WangYingGangBlogs">
+<meta property="og:description" content="RabbitMQ安装 下载rabbitmq3.7.15的docker镜像：  1docker pull rabbitmq:3.7.15   使用如下命令启动RabbitMQ服务：  12docker run -p 5672:5672 -p 15672:15672 --name rabbitmq \-d rabbitmq:3.7.15   进入容器并开启管理功能：  12docker exec -i">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_02.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_03.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_04.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_05.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_06.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_07.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_62.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_63.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_64.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_65.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_49.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_50.png">
+<meta property="og:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_51.png">
+<meta property="article:published_time" content="2021-06-04T06:54:33.000Z">
+<meta property="article:modified_time" content="2022-04-10T16:51:32.000Z">
+<meta property="article:author" content="WangYingGangBlogs">
+<meta property="article:tag" content="消息队列">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cardioid.gitee.io/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_02.png">
+
+<link rel="canonical" href="http://cardioid.gitee.io/2021/06/04/Java/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>RabbitMQ消息队列 | WangYingGangBlogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">WangYingGangBlogs</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://cardioid.gitee.io/2021/06/04/Java/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="WangYingGangBlogs">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WangYingGangBlogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          RabbitMQ消息队列
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-06-04 14:54:33" itemprop="dateCreated datePublished" datetime="2021-06-04T14:54:33+08:00">2021-06-04</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-11 00:51:32" itemprop="dateModified" datetime="2022-04-11T00:51:32+08:00">2022-04-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">消息队列</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="RabbitMQ安装"><a href="#RabbitMQ安装" class="headerlink" title="RabbitMQ安装"></a>RabbitMQ安装</h2><ul>
+<li>下载rabbitmq<code>3.7.15</code>的docker镜像：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull rabbitmq:3.7.15</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>使用如下命令启动RabbitMQ服务：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker run -p 5672:5672 -p 15672:15672 --name rabbitmq \</span><br><span class="line">-d rabbitmq:3.7.15</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>进入容器并开启管理功能：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker <span class="built_in">exec</span> -it rabbitmq /bin/bash</span><br><span class="line">rabbitmq-plugins <span class="built_in">enable</span> rabbitmq_management</span><br></pre></td></tr></table></figure>
+
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_02.png" alt="img"></p>
+<ul>
+<li>开启防火墙：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">firewall-cmd --zone=public --add-port=15672/tcp --permanent</span><br><span class="line">firewall-cmd --reload</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>访问地址查看是否安装成功：<a target="_blank" rel="noopener" href="http://192.168.3.101:15672/">http://192.168.3.101:15672</a></li>
+</ul>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_03.png" alt="img"></p>
+<ul>
+<li>输入账号密码并登录：guest guest</li>
+<li>创建帐号并设置其角色为管理员：mall mall  administrator</li>
+</ul>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_04.png" alt="img"></p>
+<ul>
+<li>创建一个新的虚拟host为：&#x2F;mall</li>
+</ul>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_05.png" alt="img"></p>
+<ul>
+<li>点击mall用户进入用户配置页面</li>
+</ul>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_06.png" alt="img"></p>
+<ul>
+<li>给mall用户配置该虚拟host的权限</li>
+</ul>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/mall_linux_deploy_07.png" alt="img"></p>
+<h2 id="业务场景说明"><a href="#业务场景说明" class="headerlink" title="业务场景说明"></a>业务场景说明</h2><blockquote>
+<p>用于解决用户下单以后，订单超时如何取消订单的问题。</p>
+</blockquote>
+<ul>
+<li>用户进行下单操作（会有锁定商品库存、使用优惠券、积分一系列的操作）；</li>
+<li>生成订单，获取订单的id；</li>
+<li>获取到设置的订单超时时间（假设设置的为60分钟不支付取消订单）；</li>
+<li>按订单超时时间发送一个延迟消息给RabbitMQ，让它在订单超时后触发取消订单的操作；</li>
+<li>如果用户没有支付，进行取消订单操作（释放锁定商品库存、返还优惠券、返回积分一系列操作）。</li>
+</ul>
+<h2 id="mall整合RabbitMQ实现延迟消息"><a href="#mall整合RabbitMQ实现延迟消息" class="headerlink" title="mall整合RabbitMQ实现延迟消息"></a>mall整合RabbitMQ实现延迟消息</h2><h3 id="在pom-xml中添加相关依赖"><a href="#在pom-xml中添加相关依赖" class="headerlink" title="在pom.xml中添加相关依赖"></a>在pom.xml中添加相关依赖</h3><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!--消息队列相关依赖--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-amqp<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--lombok依赖--&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.projectlombok<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>lombok<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">optional</span>&gt;</span>true<span class="tag">&lt;/<span class="name">optional</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="修改SpringBoot配置文件"><a href="#修改SpringBoot配置文件" class="headerlink" title="修改SpringBoot配置文件"></a>修改SpringBoot配置文件</h3><blockquote>
+<p>修改application.yml文件，在spring节点下添加RabbitMQ相关配置。</p>
+</blockquote>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rabbitmq:</span></span><br><span class="line">  <span class="attr">host:</span> <span class="string">localhost</span> <span class="comment"># rabbitmq的连接地址</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">5672</span> <span class="comment"># rabbitmq的连接端口号</span></span><br><span class="line">  <span class="attr">virtual-host:</span> <span class="string">/mall</span> <span class="comment"># rabbitmq的虚拟host</span></span><br><span class="line">  <span class="attr">username:</span> <span class="string">mall</span> <span class="comment"># rabbitmq的用户名</span></span><br><span class="line">  <span class="attr">password:</span> <span class="string">mall</span> <span class="comment"># rabbitmq的密码</span></span><br><span class="line">  <span class="attr">publisher-confirms:</span> <span class="literal">true</span> <span class="comment">#如果对异步消息需要回调必须设置为trueCopy to clipboardErrorCopied</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="添加消息队列的枚举配置类QueueEnum"><a href="#添加消息队列的枚举配置类QueueEnum" class="headerlink" title="添加消息队列的枚举配置类QueueEnum"></a>添加消息队列的枚举配置类QueueEnum</h3><blockquote>
+<p>用于延迟消息队列及处理取消订单消息队列的常量定义，包括交换机名称、队列名称、路由键名称。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.macro.mall.tiny.dto;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> lombok.Getter;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 消息队列枚举配置</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Getter</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> <span class="title class_">QueueEnum</span> &#123;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 消息通知队列</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    QUEUE_ORDER_CANCEL(<span class="string">&quot;mall.order.direct&quot;</span>, <span class="string">&quot;mall.order.cancel&quot;</span>, <span class="string">&quot;mall.order.cancel&quot;</span>),</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 消息通知ttl队列</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    QUEUE_TTL_ORDER_CANCEL(<span class="string">&quot;mall.order.direct.ttl&quot;</span>, <span class="string">&quot;mall.order.cancel.ttl&quot;</span>, <span class="string">&quot;mall.order.cancel.ttl&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 交换名称</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String exchange;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 队列名称</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 路由键</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">private</span> String routeKey;</span><br><span class="line"></span><br><span class="line">    QueueEnum(String exchange, String name, String routeKey) &#123;</span><br><span class="line">        <span class="built_in">this</span>.exchange = exchange;</span><br><span class="line">        <span class="built_in">this</span>.name = name;</span><br><span class="line">        <span class="built_in">this</span>.routeKey = routeKey;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="添加RabbitMQ的配置"><a href="#添加RabbitMQ的配置" class="headerlink" title="添加RabbitMQ的配置"></a>添加RabbitMQ的配置</h3><blockquote>
+<p>用于配置交换机、队列及队列与交换机的绑定关系。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.macro.mall.tiny.config;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.dto.QueueEnum;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.core.*;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 消息队列配置</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RabbitMqConfig</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 订单消息实际消费队列所绑定的交换机</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    DirectExchange <span class="title function_">orderDirect</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (DirectExchange) ExchangeBuilder</span><br><span class="line">                .directExchange(QueueEnum.QUEUE_ORDER_CANCEL.getExchange())</span><br><span class="line">                .durable(<span class="literal">true</span>)</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 订单延迟队列队列所绑定的交换机</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    DirectExchange <span class="title function_">orderTtlDirect</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> (DirectExchange) ExchangeBuilder</span><br><span class="line">                .directExchange(QueueEnum.QUEUE_TTL_ORDER_CANCEL.getExchange())</span><br><span class="line">                .durable(<span class="literal">true</span>)</span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 订单实际消费队列</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> Queue <span class="title function_">orderQueue</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Queue</span>(QueueEnum.QUEUE_ORDER_CANCEL.getName());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 订单延迟队列（死信队列）</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> Queue <span class="title function_">orderTtlQueue</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> QueueBuilder</span><br><span class="line">                .durable(QueueEnum.QUEUE_TTL_ORDER_CANCEL.getName())</span><br><span class="line">                .withArgument(<span class="string">&quot;x-dead-letter-exchange&quot;</span>, QueueEnum.QUEUE_ORDER_CANCEL.getExchange())<span class="comment">//到期后转发的交换机</span></span><br><span class="line">                .withArgument(<span class="string">&quot;x-dead-letter-routing-key&quot;</span>, QueueEnum.QUEUE_ORDER_CANCEL.getRouteKey())<span class="comment">//到期后转发的路由键</span></span><br><span class="line">                .build();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将订单队列绑定到交换机</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    Binding <span class="title function_">orderBinding</span><span class="params">(DirectExchange orderDirect,Queue orderQueue)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> BindingBuilder</span><br><span class="line">                .bind(orderQueue)</span><br><span class="line">                .to(orderDirect)</span><br><span class="line">                .with(QueueEnum.QUEUE_ORDER_CANCEL.getRouteKey());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 将订单延迟队列绑定到交换机</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    Binding <span class="title function_">orderTtlBinding</span><span class="params">(DirectExchange orderTtlDirect,Queue orderTtlQueue)</span>&#123;</span><br><span class="line">        <span class="keyword">return</span> BindingBuilder</span><br><span class="line">                .bind(orderTtlQueue)</span><br><span class="line">                .to(orderTtlDirect)</span><br><span class="line">                .with(QueueEnum.QUEUE_TTL_ORDER_CANCEL.getRouteKey());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="在RabbitMQ管理页面可以看到以下交换机和队列"><a href="#在RabbitMQ管理页面可以看到以下交换机和队列" class="headerlink" title="在RabbitMQ管理页面可以看到以下交换机和队列"></a>在RabbitMQ管理页面可以看到以下交换机和队列</h4><p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_62.png" alt="img"> <img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_63.png" alt="img"></p>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_64.png" alt="img"> <img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_65.png" alt="img"></p>
+<h4 id="交换机及队列说明"><a href="#交换机及队列说明" class="headerlink" title="交换机及队列说明"></a>交换机及队列说明</h4><ul>
+<li>mall.order.direct（取消订单消息队列所绑定的交换机）:绑定的队列为mall.order.cancel，一旦有消息以mall.order.cancel为路由键发过来，会发送到此队列。</li>
+<li>mall.order.direct.ttl（订单延迟消息队列所绑定的交换机）:绑定的队列为mall.order.cancel.ttl，一旦有消息以mall.order.cancel.ttl为路由键发送过来，会转发到此队列，并在此队列保存一定时间，等到超时后会自动将消息发送到mall.order.cancel（取消订单消息消费队列）。</li>
+</ul>
+<h3 id="添加延迟消息的发送者CancelOrderSender"><a href="#添加延迟消息的发送者CancelOrderSender" class="headerlink" title="添加延迟消息的发送者CancelOrderSender"></a>添加延迟消息的发送者CancelOrderSender</h3><blockquote>
+<p>用于向订单延迟消息队列（mall.order.cancel.ttl）里发送消息。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.macro.mall.tiny.component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.dto.QueueEnum;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.AmqpException;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.core.AmqpTemplate;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.core.Message;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.core.MessagePostProcessor;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 取消订单消息的发出者</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CancelOrderSender</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">Logger</span> <span class="variable">LOGGER</span> <span class="operator">=</span>LoggerFactory.getLogger(CancelOrderSender.class);</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> AmqpTemplate amqpTemplate;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sendMessage</span><span class="params">(Long orderId,<span class="keyword">final</span> <span class="type">long</span> delayTimes)</span>&#123;</span><br><span class="line">        <span class="comment">//给延迟队列发送消息</span></span><br><span class="line">        amqpTemplate.convertAndSend(QueueEnum.QUEUE_TTL_ORDER_CANCEL.getExchange(), QueueEnum.QUEUE_TTL_ORDER_CANCEL.getRouteKey(), orderId, <span class="keyword">new</span> <span class="title class_">MessagePostProcessor</span>() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> Message <span class="title function_">postProcessMessage</span><span class="params">(Message message)</span> <span class="keyword">throws</span> AmqpException &#123;</span><br><span class="line">                <span class="comment">//给消息设置延迟毫秒值</span></span><br><span class="line">                message.getMessageProperties().setExpiration(String.valueOf(delayTimes));</span><br><span class="line">                <span class="keyword">return</span> message;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">        LOGGER.info(<span class="string">&quot;send delay message orderId:&#123;&#125;&quot;</span>,orderId);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="添加取消订单消息的接收者CancelOrderReceiver"><a href="#添加取消订单消息的接收者CancelOrderReceiver" class="headerlink" title="添加取消订单消息的接收者CancelOrderReceiver"></a>添加取消订单消息的接收者CancelOrderReceiver</h3><blockquote>
+<p>用于从取消订单的消息队列（mall.order.cancel）里接收消息。</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.macro.mall.tiny.component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.service.OmsPortalOrderService;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.rabbit.annotation.RabbitHandler;</span><br><span class="line"><span class="keyword">import</span> org.springframework.amqp.rabbit.annotation.RabbitListener;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 取消订单消息的处理者</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="meta">@RabbitListener(queues = &quot;mall.order.cancel&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">CancelOrderReceiver</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">Logger</span> <span class="variable">LOGGER</span> <span class="operator">=</span>LoggerFactory.getLogger(CancelOrderReceiver.class);</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> OmsPortalOrderService portalOrderService;</span><br><span class="line">    <span class="meta">@RabbitHandler</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">handle</span><span class="params">(Long orderId)</span>&#123;</span><br><span class="line">        LOGGER.info(<span class="string">&quot;receive delay message orderId:&#123;&#125;&quot;</span>,orderId);</span><br><span class="line">        portalOrderService.cancelOrder(orderId);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="添加OmsPortalOrderService接口"><a href="#添加OmsPortalOrderService接口" class="headerlink" title="添加OmsPortalOrderService接口"></a>添加OmsPortalOrderService接口</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.macro.mall.tiny.service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.common.api.CommonResult;</span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.dto.OrderParam;</span><br><span class="line"><span class="keyword">import</span> org.springframework.transaction.annotation.Transactional;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 前台订单管理Service</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">interface</span> <span class="title class_">OmsPortalOrderService</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 根据提交信息生成订单</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    CommonResult <span class="title function_">generateOrder</span><span class="params">(OrderParam orderParam)</span>;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 取消单个超时订单</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Transactional</span></span><br><span class="line">    <span class="keyword">void</span> <span class="title function_">cancelOrder</span><span class="params">(Long orderId)</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="添加OmsPortalOrderService的实现类OmsPortalOrderServiceImpl"><a href="#添加OmsPortalOrderService的实现类OmsPortalOrderServiceImpl" class="headerlink" title="添加OmsPortalOrderService的实现类OmsPortalOrderServiceImpl"></a>添加OmsPortalOrderService的实现类OmsPortalOrderServiceImpl</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.macro.mall.tiny.service.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.common.api.CommonResult;</span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.component.CancelOrderSender;</span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.dto.OrderParam;</span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.service.OmsPortalOrderService;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.Logger;</span><br><span class="line"><span class="keyword">import</span> org.slf4j.LoggerFactory;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 前台订单管理Service</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Service</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OmsPortalOrderServiceImpl</span> <span class="keyword">implements</span> <span class="title class_">OmsPortalOrderService</span> &#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="type">Logger</span> <span class="variable">LOGGER</span> <span class="operator">=</span> LoggerFactory.getLogger(OmsPortalOrderServiceImpl.class);</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> CancelOrderSender cancelOrderSender;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> CommonResult <span class="title function_">generateOrder</span><span class="params">(OrderParam orderParam)</span> &#123;</span><br><span class="line">        <span class="comment">//todo 执行一系类下单操作，具体参考mall项目</span></span><br><span class="line">        LOGGER.info(<span class="string">&quot;process generateOrder&quot;</span>);</span><br><span class="line">        <span class="comment">//下单完成后开启一个延迟消息，用于当用户没有付款时取消订单（orderId应该在下单后生成）</span></span><br><span class="line">        sendDelayMessageCancelOrder(<span class="number">11L</span>);</span><br><span class="line">        <span class="keyword">return</span> CommonResult.success(<span class="literal">null</span>, <span class="string">&quot;下单成功&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">cancelOrder</span><span class="params">(Long orderId)</span> &#123;</span><br><span class="line">        <span class="comment">//todo 执行一系类取消订单操作，具体参考mall项目</span></span><br><span class="line">        LOGGER.info(<span class="string">&quot;process cancelOrder orderId:&#123;&#125;&quot;</span>,orderId);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">void</span> <span class="title function_">sendDelayMessageCancelOrder</span><span class="params">(Long orderId)</span> &#123;</span><br><span class="line">        <span class="comment">//获取订单超时时间，假设为60分钟</span></span><br><span class="line">        <span class="type">long</span> <span class="variable">delayTimes</span> <span class="operator">=</span> <span class="number">30</span> * <span class="number">1000</span>;</span><br><span class="line">        <span class="comment">//发送延迟消息</span></span><br><span class="line">        cancelOrderSender.sendMessage(orderId, delayTimes);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h3 id="添加OmsPortalOrderController定义接口"><a href="#添加OmsPortalOrderController定义接口" class="headerlink" title="添加OmsPortalOrderController定义接口]"></a>添加OmsPortalOrderController定义接口]</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> com.macro.mall.tiny.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.dto.OrderParam;</span><br><span class="line"><span class="keyword">import</span> com.macro.mall.tiny.service.OmsPortalOrderService;</span><br><span class="line"><span class="keyword">import</span> io.swagger.annotations.Api;</span><br><span class="line"><span class="keyword">import</span> io.swagger.annotations.ApiOperation;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestBody;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMethod;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 订单管理Controller</span></span><br><span class="line"><span class="comment"> </span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="meta">@Api(tags = &quot;OmsPortalOrderController&quot;, description = &quot;订单管理&quot;)</span></span><br><span class="line"><span class="meta">@RequestMapping(&quot;/order&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">OmsPortalOrderController</span> &#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> OmsPortalOrderService portalOrderService;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@ApiOperation(&quot;根据购物车信息生成订单&quot;)</span></span><br><span class="line">    <span class="meta">@RequestMapping(value = &quot;/generateOrder&quot;, method = RequestMethod.POST)</span></span><br><span class="line">    <span class="meta">@ResponseBody</span></span><br><span class="line">    <span class="keyword">public</span> Object <span class="title function_">generateOrder</span><span class="params">(<span class="meta">@RequestBody</span> OrderParam orderParam)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> portalOrderService.generateOrder(orderParam);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="进行接口测试"><a href="#进行接口测试" class="headerlink" title="进行接口测试"></a>进行接口测试</h2><h3 id="调用下单接口"><a href="#调用下单接口" class="headerlink" title="调用下单接口"></a>调用下单接口</h3><p>注意：已经将延迟消息时间设置为30秒</p>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_49.png" alt="img"></p>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_50.png" alt="img"></p>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97RabbitMQ/arch_screen_51.png" alt="img"></p>
+<h2 id="整合"><a href="#整合" class="headerlink" title="整合"></a>整合</h2><h4 id="1、引入-Spring-boot-starter-amqp"><a href="#1、引入-Spring-boot-starter-amqp" class="headerlink" title="1、引入 Spring-boot-starter-amqp"></a>1、引入 Spring-boot-starter-amqp</h4><figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-starter-amqp<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h4 id="2、application-yml配置"><a href="#2、application-yml配置" class="headerlink" title="2、application.yml配置"></a>2、application.yml配置</h4><figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">rabbitmq:</span></span><br><span class="line">    <span class="attr">host:</span> <span class="number">192.168</span><span class="number">.56</span><span class="number">.10</span></span><br><span class="line">    <span class="attr">port:</span> <span class="number">5672</span></span><br><span class="line">    <span class="attr">virtual-host:</span> <span class="string">/</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="3、测试RabbitMQ"><a href="#3、测试RabbitMQ" class="headerlink" title="3、测试RabbitMQ"></a>3、测试RabbitMQ</h4><h5 id="1、AmqpAdmin-管理组件"><a href="#1、AmqpAdmin-管理组件" class="headerlink" title="1、AmqpAdmin:管理组件"></a>1、AmqpAdmin:管理组件</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"> <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建Exchange</span></span><br><span class="line"><span class="comment">     * 1、如何利用Exchange,Queue,Binding</span></span><br><span class="line"><span class="comment">     *      1、使用AmqpAdmin进行创建</span></span><br><span class="line"><span class="comment">     * 2、如何收发信息</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">contextLoads</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">//	public DirectExchange(</span></span><br><span class="line">        <span class="comment">//	String name, 交换机的名字</span></span><br><span class="line">        <span class="comment">//	boolean durable, 是否持久</span></span><br><span class="line">        <span class="comment">//	boolean autoDelete, 是否自动删除</span></span><br><span class="line">        <span class="comment">//	Map&lt;String, Object&gt; arguments)</span></span><br><span class="line">        <span class="comment">//	&#123;</span></span><br><span class="line">        <span class="type">DirectExchange</span> <span class="variable">directExchange</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">DirectExchange</span>(<span class="string">&quot;hello-java.exchange&quot;</span>,<span class="literal">true</span>,<span class="literal">false</span>);</span><br><span class="line">        amqpAdmin.declareExchange(directExchange);</span><br><span class="line">        log.info(<span class="string">&quot;Exchange[&#123;&#125;]创建成功：&quot;</span>,<span class="string">&quot;hello-java.exchange&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 创建队列</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createQueue</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// public Queue(String name, boolean durable, boolean exclusive, boolean autoDelete, Map&lt;String, Object&gt; arguments) &#123;</span></span><br><span class="line">        <span class="type">Queue</span> <span class="variable">queue</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Queue</span>(<span class="string">&quot;hello-java-queue&quot;</span>,<span class="literal">true</span>,<span class="literal">false</span>,<span class="literal">false</span>);</span><br><span class="line">        amqpAdmin.declareQueue(queue);</span><br><span class="line">        log.info(<span class="string">&quot;Queue[&#123;&#125;]:&quot;</span>,<span class="string">&quot;创建成功&quot;</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 绑定队列</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createBinding</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="comment">// public Binding(String destination, 目的地</span></span><br><span class="line">        <span class="comment">// DestinationType destinationType, 目的地类型</span></span><br><span class="line">        <span class="comment">// String exchange,交换机</span></span><br><span class="line">        <span class="comment">// String routingKey,//路由键</span></span><br><span class="line">        <span class="type">Binding</span> <span class="variable">binding</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Binding</span>(<span class="string">&quot;hello-java-queue&quot;</span>,</span><br><span class="line">                Binding.DestinationType.QUEUE,</span><br><span class="line">                <span class="string">&quot;hello-java.exchange&quot;</span>,</span><br><span class="line">                <span class="string">&quot;hello.java&quot;</span>,<span class="literal">null</span>);</span><br><span class="line">        amqpAdmin.declareBinding(binding);</span><br><span class="line">        log.info(<span class="string">&quot;Binding[&#123;&#125;]创建成功&quot;</span>,<span class="string">&quot;hello-java-binding&quot;</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h5 id="2、RabbitTemplate：消息发送处理组件"><a href="#2、RabbitTemplate：消息发送处理组件" class="headerlink" title="2、RabbitTemplate：消息发送处理组件"></a>2、RabbitTemplate：消息发送处理组件</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line">   <span class="meta">@Test</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">sendMessageTest</span><span class="params">()</span> &#123;</span><br><span class="line">       <span class="keyword">for</span>(<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">1</span>; i &lt;=<span class="number">5</span>; i++) &#123;</span><br><span class="line">           <span class="keyword">if</span>(i%<span class="number">2</span>==<span class="number">0</span>) &#123;</span><br><span class="line">               <span class="type">OrderReturnReasonEntity</span> <span class="variable">reasonEntity</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OrderReturnReasonEntity</span>();</span><br><span class="line">               reasonEntity.setId(<span class="number">1l</span>);</span><br><span class="line">               reasonEntity.setCreateTime(<span class="keyword">new</span> <span class="title class_">java</span>.util.Date());</span><br><span class="line">               reasonEntity.setName(<span class="string">&quot;哈哈&quot;</span>);</span><br><span class="line">               <span class="comment">//</span></span><br><span class="line">               <span class="type">String</span> <span class="variable">msg</span> <span class="operator">=</span> <span class="string">&quot;Hello World&quot;</span>;</span><br><span class="line">               <span class="comment">// 发送的对象类型的消息，可以是一个json</span></span><br><span class="line">               rabbitTemplate.convertAndSend(<span class="string">&quot;hello-java.exchange&quot;</span>,<span class="string">&quot;hello.java&quot;</span>,reasonEntity);</span><br><span class="line">           &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">               <span class="type">OrderEntity</span> <span class="variable">orderEntity</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">OrderEntity</span>();</span><br><span class="line">               orderEntity.setOrderSn(UUID.randomUUID().toString());</span><br><span class="line">               rabbitTemplate.convertAndSend(<span class="string">&quot;hello-java.exchange&quot;</span>,<span class="string">&quot;hello.java&quot;</span>,orderEntity);</span><br><span class="line">           &#125;</span><br><span class="line">           log.info(<span class="string">&quot;消息发送完成&#123;&#125;&quot;</span>);</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" rel="tag"># 消息队列</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/06/02/Java/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/" rel="prev" title="为什么选择 Kafka消息队列">
+      <i class="fa fa-chevron-left"></i> 为什么选择 Kafka消息队列
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/07/11/Java/mybatis/mybatis/" rel="next" title="MyBatis使用">
+      MyBatis使用 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#RabbitMQ%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">RabbitMQ安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%9A%E5%8A%A1%E5%9C%BA%E6%99%AF%E8%AF%B4%E6%98%8E"><span class="nav-number">2.</span> <span class="nav-text">业务场景说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mall%E6%95%B4%E5%90%88RabbitMQ%E5%AE%9E%E7%8E%B0%E5%BB%B6%E8%BF%9F%E6%B6%88%E6%81%AF"><span class="nav-number">3.</span> <span class="nav-text">mall整合RabbitMQ实现延迟消息</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9C%A8pom-xml%E4%B8%AD%E6%B7%BB%E5%8A%A0%E7%9B%B8%E5%85%B3%E4%BE%9D%E8%B5%96"><span class="nav-number">3.1.</span> <span class="nav-text">在pom.xml中添加相关依赖</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BF%AE%E6%94%B9SpringBoot%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6"><span class="nav-number">3.2.</span> <span class="nav-text">修改SpringBoot配置文件</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%9A%84%E6%9E%9A%E4%B8%BE%E9%85%8D%E7%BD%AE%E7%B1%BBQueueEnum"><span class="nav-number">3.3.</span> <span class="nav-text">添加消息队列的枚举配置类QueueEnum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0RabbitMQ%E7%9A%84%E9%85%8D%E7%BD%AE"><span class="nav-number">3.4.</span> <span class="nav-text">添加RabbitMQ的配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9C%A8RabbitMQ%E7%AE%A1%E7%90%86%E9%A1%B5%E9%9D%A2%E5%8F%AF%E4%BB%A5%E7%9C%8B%E5%88%B0%E4%BB%A5%E4%B8%8B%E4%BA%A4%E6%8D%A2%E6%9C%BA%E5%92%8C%E9%98%9F%E5%88%97"><span class="nav-number">3.4.1.</span> <span class="nav-text">在RabbitMQ管理页面可以看到以下交换机和队列</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BA%A4%E6%8D%A2%E6%9C%BA%E5%8F%8A%E9%98%9F%E5%88%97%E8%AF%B4%E6%98%8E"><span class="nav-number">3.4.2.</span> <span class="nav-text">交换机及队列说明</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E5%BB%B6%E8%BF%9F%E6%B6%88%E6%81%AF%E7%9A%84%E5%8F%91%E9%80%81%E8%80%85CancelOrderSender"><span class="nav-number">3.5.</span> <span class="nav-text">添加延迟消息的发送者CancelOrderSender</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0%E5%8F%96%E6%B6%88%E8%AE%A2%E5%8D%95%E6%B6%88%E6%81%AF%E7%9A%84%E6%8E%A5%E6%94%B6%E8%80%85CancelOrderReceiver"><span class="nav-number">3.6.</span> <span class="nav-text">添加取消订单消息的接收者CancelOrderReceiver</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0OmsPortalOrderService%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.7.</span> <span class="nav-text">添加OmsPortalOrderService接口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0OmsPortalOrderService%E7%9A%84%E5%AE%9E%E7%8E%B0%E7%B1%BBOmsPortalOrderServiceImpl"><span class="nav-number">3.8.</span> <span class="nav-text">添加OmsPortalOrderService的实现类OmsPortalOrderServiceImpl</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B7%BB%E5%8A%A0OmsPortalOrderController%E5%AE%9A%E4%B9%89%E6%8E%A5%E5%8F%A3"><span class="nav-number">3.9.</span> <span class="nav-text">添加OmsPortalOrderController定义接口]</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%BF%9B%E8%A1%8C%E6%8E%A5%E5%8F%A3%E6%B5%8B%E8%AF%95"><span class="nav-number">4.</span> <span class="nav-text">进行接口测试</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E4%B8%8B%E5%8D%95%E6%8E%A5%E5%8F%A3"><span class="nav-number">4.1.</span> <span class="nav-text">调用下单接口</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B4%E5%90%88"><span class="nav-number">5.</span> <span class="nav-text">整合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E5%BC%95%E5%85%A5-Spring-boot-starter-amqp"><span class="nav-number">5.0.1.</span> <span class="nav-text">1、引入 Spring-boot-starter-amqp</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81application-yml%E9%85%8D%E7%BD%AE"><span class="nav-number">5.0.2.</span> <span class="nav-text">2、application.yml配置</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81%E6%B5%8B%E8%AF%95RabbitMQ"><span class="nav-number">5.0.3.</span> <span class="nav-text">3、测试RabbitMQ</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1%E3%80%81AmqpAdmin-%E7%AE%A1%E7%90%86%E7%BB%84%E4%BB%B6"><span class="nav-number">5.0.3.1.</span> <span class="nav-text">1、AmqpAdmin:管理组件</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%E3%80%81RabbitTemplate%EF%BC%9A%E6%B6%88%E6%81%AF%E5%8F%91%E9%80%81%E5%A4%84%E7%90%86%E7%BB%84%E4%BB%B6"><span class="nav-number">5.0.3.2.</span> <span class="nav-text">2、RabbitTemplate：消息发送处理组件</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">5.1.</span> <span class="nav-text"></span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">WangYingGangBlogs</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WangYingGangBlogs</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

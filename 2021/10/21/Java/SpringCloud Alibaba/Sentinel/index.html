@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"cardioid.gitee.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="SpringCloud Alibaba-Sentinel1、简介1、服务降级限流熔断： ​	A 服务调用 B 服务的某个功能， B 服务卡机，导致功能时间超长可以直接将 B 断路了 （A 不在请求  B 接口）凡是调用 B 服务的直接返回降级数据，不必等待 B 的 超时执行，这样 B 的故障问题，就不会级联影响到 A。 降级： ​	整个网站处于流量高峰期服务器压力剧增，根据当前自身业务情况以及流量">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Sentinel的使用笔记">
+<meta property="og:url" content="http://cardioid.gitee.io/2021/10/21/Java/SpringCloud%20Alibaba/Sentinel/index.html">
+<meta property="og:site_name" content="WangYingGangBlogs">
+<meta property="og:description" content="SpringCloud Alibaba-Sentinel1、简介1、服务降级限流熔断： ​	A 服务调用 B 服务的某个功能， B 服务卡机，导致功能时间超长可以直接将 B 断路了 （A 不在请求  B 接口）凡是调用 B 服务的直接返回降级数据，不必等待 B 的 超时执行，这样 B 的故障问题，就不会级联影响到 A。 降级： ​	整个网站处于流量高峰期服务器压力剧增，根据当前自身业务情况以及流量">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://cardioid.gitee.io/Sentinel/image-20201125120634969.png">
+<meta property="og:image" content="http://cardioid.gitee.io/Sentinel/image-20201126154714221.png">
+<meta property="og:image" content="http://cardioid.gitee.io/Sentinel/image-20201126165501709.png">
+<meta property="og:image" content="http://cardioid.gitee.io/Sentinel/image-20201126165336761.png">
+<meta property="og:image" content="http://cardioid.gitee.io/Sentinel/image-20201126164858768.png">
+<meta property="og:image" content="http://cardioid.gitee.io/Sentinel/image-20201126161848389.png">
+<meta property="og:image" content="http://cardioid.gitee.io/Sentinel/image-20201127102052864.png">
+<meta property="article:published_time" content="2021-10-21T13:17:13.000Z">
+<meta property="article:modified_time" content="2022-02-09T10:10:44.000Z">
+<meta property="article:author" content="WangYingGangBlogs">
+<meta property="article:tag" content="SpringCloud">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cardioid.gitee.io/Sentinel/image-20201125120634969.png">
+
+<link rel="canonical" href="http://cardioid.gitee.io/2021/10/21/Java/SpringCloud%20Alibaba/Sentinel/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>Sentinel的使用笔记 | WangYingGangBlogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">WangYingGangBlogs</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://cardioid.gitee.io/2021/10/21/Java/SpringCloud%20Alibaba/Sentinel/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="WangYingGangBlogs">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WangYingGangBlogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Sentinel的使用笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-10-21 21:17:13" itemprop="dateCreated datePublished" datetime="2021-10-21T21:17:13+08:00">2021-10-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-02-09 18:10:44" itemprop="dateModified" datetime="2022-02-09T18:10:44+08:00">2022-02-09</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/SpringCloud/" itemprop="url" rel="index"><span itemprop="name">SpringCloud</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="SpringCloud-Alibaba-Sentinel"><a href="#SpringCloud-Alibaba-Sentinel" class="headerlink" title="SpringCloud Alibaba-Sentinel"></a>SpringCloud Alibaba-Sentinel</h3><h4 id="1、简介"><a href="#1、简介" class="headerlink" title="1、简介"></a>1、简介</h4><h5 id="1、服务降级限流"><a href="#1、服务降级限流" class="headerlink" title="1、服务降级限流"></a>1、服务降级限流</h5><p><strong>熔断：</strong></p>
+<p>​	A 服务调用 B 服务的某个功能， B 服务卡机，导致功能时间超长可以<strong>直接将 B 断路</strong>了</p>
+<p>（A 不在请求  B 接口）凡是调用 B 服务的<strong>直接返回降级数据</strong>，不必等待 B 的 超时执行，这样 B 的故障问题，就不会级联影响到 A。</p>
+<p><strong>降级：</strong></p>
+<p>​	整个网站处于流量<strong>高峰期服务器压力剧增</strong>，根据当前自身业务情况以及流量，对一些服务和页面进行有策略的降级&#x2F;停止服务，所有的调用<strong>直接返回降级数据</strong>以此缓解服务器资源的压力，以保证核心业务的正常运行，同时也保持了客户和大部分客户等到正确的响应</p>
+<p><strong>限流：</strong></p>
+<p>​	对打入的服务的请求流量进行控制，使服务能够承担不超过自己能力的流量压力</p>
+<h5 id="2、Sentinel-简介"><a href="#2、Sentinel-简介" class="headerlink" title="2、Sentinel 简介"></a>2、Sentinel 简介</h5><p>官方文档：<a target="_blank" rel="noopener" href="https://github.com/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D">https://github.com/alibaba/Sentinel/wiki/%E4%BB%8B%E7%BB%8D</a></p>
+<p>项目文档：<a target="_blank" rel="noopener" href="https://github.com/alibaba/Sentinel">https://github.com/alibaba/Sentinel</a></p>
+<p>随着微服务的流行，服务和服务之间的稳定性变得越来越重要。Sentinel 以流量为切入点，从流量控制、熔断降级、系统负载保护等多个维度保护服务的稳定性。</p>
+<p><strong>Sentinel 分为两个部分:</strong></p>
+<ul>
+<li>核心库（Java 客户端）不依赖任何框架&#x2F;库，能够运行于所有 Java 运行时环境，同时对 Dubbo &#x2F; Spring Cloud 等框架也有较好的支持。</li>
+<li>控制台（Dashboard）基于 Spring Boot 开发，打包后可以直接运行，不需要额外的 Tomcat 等应用容器。</li>
+</ul>
+<p><strong>Sentinel 基本概念:</strong></p>
+<ul>
+<li>资源<ul>
+<li>资源是 Sentinel 的关键概念。它可以是 Java 应用程序中的任何内容，例如，由应用程序提供的服务，或由应用程序调用的其它应用提供的服务，甚至可以是一段代码。在接下来的文档中，我们都会用资源来描述代码块。</li>
+<li><strong>只要通过 Sentinel API 定义的代码，就是资源，能够被 Sentinel 保护起来</strong>。大部分情况下，可以使用方法签名，URL，甚至服务名称作为资源名来标示资源。</li>
+</ul>
+</li>
+<li>规则<ul>
+<li>围绕资源的实时状态设定的规则，可以包括<strong>流量控制规则、熔断降级规则以及系统保护规则。所有规则可以动态实时调整。</strong></li>
+</ul>
+</li>
+</ul>
+<h4 id="2、Hystrix-与-Sentinel-比较"><a href="#2、Hystrix-与-Sentinel-比较" class="headerlink" title="2、Hystrix 与 Sentinel 比较"></a>2、Hystrix 与 Sentinel 比较</h4><p><img src="/Sentinel/image-20201125120634969.png" alt="image-20201125120634969"></p>
+<h4 id="3、整合-Feign-和-Sentinel-测试熔断降级"><a href="#3、整合-Feign-和-Sentinel-测试熔断降级" class="headerlink" title="3、整合 Feign 和 Sentinel 测试熔断降级"></a>3、整合 Feign 和 Sentinel 测试熔断降级</h4><p>熔断降级官网解释：<a target="_blank" rel="noopener" href="https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7">https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7</a></p>
+<p>Spring-  Cloud整合Sentinel和Feign：<a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel">https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel</a></p>
+<p>pom.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">&lt;!-- 导入sentinel依赖 --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-alibaba-sentinel<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="comment">&lt;!--导入openFeign --&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-starter-openfeign<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>application.properties </p>
+<figure class="highlight properties"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">## sentinel与项目间的通信端口</span></span><br><span class="line"><span class="attr">spring.cloud.sentinel.transport.port</span>=<span class="string">8719</span></span><br><span class="line"><span class="comment">## sentinel端口设置</span></span><br><span class="line"><span class="attr">spring.cloud.sentinel.transport.dashboard</span>=<span class="string">localhost:8333</span></span><br><span class="line"><span class="comment">## 暴露信息</span></span><br><span class="line"><span class="attr">management.endpoints.web.exposure.exclude</span>=<span class="string">*</span></span><br><span class="line"><span class="comment">## 配置文件打开 Sentinel 对 Feign 的支持</span></span><br><span class="line"><span class="attr">feign.sentinel.enabled</span>=<span class="string">true</span></span><br></pre></td></tr></table></figure>
+
+<p>开启后，在微服务中调用远程服务，Sentinel 就会记录微服务之间的调用，从而对远程调用进行设置熔断降级等。</p>
+<p>请求设置</p>
+<p><img src="/Sentinel/image-20201126154714221.png" alt="image-20201126154714221"></p>
+<p>设置流控规则</p>
+<p><img src="/Sentinel/image-20201126165501709.png" alt="image-20201126165501709"></p>
+<p>Feign设置</p>
+<p><img src="/Sentinel/image-20201126165336761.png" alt="image-20201126165336761"></p>
+<p>结果</p>
+<p><img src="/Sentinel/image-20201126164858768.png" alt="image-20201126164858768"></p>
+<h4 id="4、整合-Sentinel-测试限流"><a href="#4、整合-Sentinel-测试限流" class="headerlink" title="4、整合 Sentinel 测试限流"></a>4、整合 Sentinel 测试限流</h4><p>官网Spring-Cloud 整合：<a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel">https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel</a></p>
+<p>Pom.xml</p>
+<blockquote>
+<p>参考 3、整合 Feign 和 Sentinel 测试熔断降级</p>
+</blockquote>
+<p>控制台：</p>
+<p><img src="/Sentinel/image-20201126161848389.png"></p>
+<p>超过单继阈值，返回自定义请求结果</p>
+<p>实现方式：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  		1、代码</span></span><br><span class="line"><span class="comment"> *      	try (Entry entry = SphU.entry(&quot;resourceName&quot;)) &#123;</span></span><br><span class="line"><span class="comment"> *      	&#125;(BlockedException e)&#123;&#125;</span></span><br><span class="line"><span class="comment"> *      2、基于注解</span></span><br><span class="line"><span class="comment"> *       	<span class="doctag">@SentinelResource</span>(value = &quot;getCurrentSeckillSkusSource&quot;,blockHandler = &quot;BlockHandler&quot;)</span></span><br><span class="line"><span class="comment"> *       	无论1/2方式一定要配置限流以后的默认返回</span></span><br><span class="line"><span class="comment"> *       	url可以设置统一返回</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">**/</span></span><br></pre></td></tr></table></figure>
+
+<p>具体实现方式参考官网给出文档：<a target="_blank" rel="noopener" href="https://github.com/alibaba/Sentinel/wiki/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8">https://github.com/alibaba/Sentinel/wiki/%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8</a></p>
+<h4 id="5、Sentinel网关限流"><a href="#5、Sentinel网关限流" class="headerlink" title="5、Sentinel网关限流"></a>5、Sentinel网关限流</h4><p>官网文档：<a target="_blank" rel="noopener" href="https://github.com/alibaba/Sentinel/wiki/%E7%BD%91%E5%85%B3%E9%99%90%E6%B5%81">https://github.com/alibaba/Sentinel/wiki/%E7%BD%91%E5%85%B3%E9%99%90%E6%B5%81</a></p>
+<p>pom.xml</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-alibaba-sentinel-gateway<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>启动Sentinle1.7.1 后比原先的1.6.1多个一个功能</p>
+<p><img src="/Sentinel/image-20201127102052864.png" alt="image-20201127102052864"></p>
+<p>您可以在 <code>GatewayCallbackManager</code> 注册回调进行定制：</p>
+<ul>
+<li><code>setBlockHandler</code>：注册函数用于实现自定义的逻辑处理被限流的请求，对应接口为 <code>BlockRequestHandler</code>。默认实现为 <code>DefaultBlockRequestHandler</code>，当被限流时会返回类似于下面的错误信息：<code>Blocked by Sentinel: FlowException</code>。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">SentinelGatewayConfig</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="title function_">SentinelGatewayConfig</span><span class="params">()</span> &#123;</span><br><span class="line">        GatewayCallbackManager.setBlockHandler(<span class="keyword">new</span> <span class="title class_">BlockRequestHandler</span>() &#123;</span><br><span class="line">            <span class="comment">// 网关限流了 就会回调</span></span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="keyword">public</span> Mono&lt;ServerResponse&gt; <span class="title function_">handleRequest</span><span class="params">(ServerWebExchange serverWebExchange, Throwable throwable)</span> &#123;</span><br><span class="line">                <span class="type">R</span> <span class="variable">error</span> <span class="operator">=</span> R.error(BizCodeEnume.TO_MANY_REQUEST.getCode(), BizCodeEnume.TO_MANY_REQUEST.getMsg());</span><br><span class="line">                <span class="type">String</span> <span class="variable">errorJson</span> <span class="operator">=</span> JSON.toJSONString(error);</span><br><span class="line">                Mono&lt;ServerResponse&gt; body = ServerResponse.ok().body(Mono.just(errorJson), String.class);</span><br><span class="line">                <span class="keyword">return</span> body;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3>
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/SpringCloud/" rel="tag"># SpringCloud</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/19/Java/redis-%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/" rel="prev" title="布隆过滤器">
+      <i class="fa fa-chevron-left"></i> 布隆过滤器
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/10/28/Java/%E7%BC%93%E5%AD%98/redis/" rel="next" title="redis">
+      redis <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#SpringCloud-Alibaba-Sentinel"><span class="nav-number">1.</span> <span class="nav-text">SpringCloud Alibaba-Sentinel</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1%E3%80%81%E7%AE%80%E4%BB%8B"><span class="nav-number">1.1.</span> <span class="nav-text">1、简介</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#1%E3%80%81%E6%9C%8D%E5%8A%A1%E9%99%8D%E7%BA%A7%E9%99%90%E6%B5%81"><span class="nav-number">1.1.1.</span> <span class="nav-text">1、服务降级限流</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2%E3%80%81Sentinel-%E7%AE%80%E4%BB%8B"><span class="nav-number">1.1.2.</span> <span class="nav-text">2、Sentinel 简介</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2%E3%80%81Hystrix-%E4%B8%8E-Sentinel-%E6%AF%94%E8%BE%83"><span class="nav-number">1.2.</span> <span class="nav-text">2、Hystrix 与 Sentinel 比较</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3%E3%80%81%E6%95%B4%E5%90%88-Feign-%E5%92%8C-Sentinel-%E6%B5%8B%E8%AF%95%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7"><span class="nav-number">1.3.</span> <span class="nav-text">3、整合 Feign 和 Sentinel 测试熔断降级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4%E3%80%81%E6%95%B4%E5%90%88-Sentinel-%E6%B5%8B%E8%AF%95%E9%99%90%E6%B5%81"><span class="nav-number">1.4.</span> <span class="nav-text">4、整合 Sentinel 测试限流</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5%E3%80%81Sentinel%E7%BD%91%E5%85%B3%E9%99%90%E6%B5%81"><span class="nav-number">1.5.</span> <span class="nav-text">5、Sentinel网关限流</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link"><span class="nav-number">2.</span> <span class="nav-text"></span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">WangYingGangBlogs</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WangYingGangBlogs</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>

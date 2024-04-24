@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 7.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"cardioid.gitee.io","root":"/","scheme":"Muse","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="sql语句暂未整理 mysql安装使用问题1.不允许远程连接方法一：  问题描述 Host ‘xxx’ is not allowed to connect to this MySQL server 1130-主机‘xxx’不允许连接到此MySQL服务器   步骤一 登陆 mysql -u root -p 步骤二 查询user表 use mysql; select host from user wh">
+<meta property="og:type" content="article">
+<meta property="og:title" content="mysql安装使用问题">
+<meta property="og:url" content="http://cardioid.gitee.io/2021/10/10/Java/mysql/mysql/index.html">
+<meta property="og:site_name" content="WangYingGangBlogs">
+<meta property="og:description" content="sql语句暂未整理 mysql安装使用问题1.不允许远程连接方法一：  问题描述 Host ‘xxx’ is not allowed to connect to this MySQL server 1130-主机‘xxx’不允许连接到此MySQL服务器   步骤一 登陆 mysql -u root -p 步骤二 查询user表 use mysql; select host from user wh">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://cardioid.gitee.io/mysql/20210620124108836.png">
+<meta property="article:published_time" content="2021-10-10T15:45:55.000Z">
+<meta property="article:modified_time" content="2022-04-10T16:43:12.000Z">
+<meta property="article:author" content="WangYingGangBlogs">
+<meta property="article:tag" content="mysql">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://cardioid.gitee.io/mysql/20210620124108836.png">
+
+<link rel="canonical" href="http://cardioid.gitee.io/2021/10/10/Java/mysql/mysql/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'en'
+  };
+</script>
+
+  <title>mysql安装使用问题 | WangYingGangBlogs</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="Toggle navigation bar">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">WangYingGangBlogs</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>Home</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>Archives</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="en">
+    <link itemprop="mainEntityOfPage" href="http://cardioid.gitee.io/2021/10/10/Java/mysql/mysql/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="WangYingGangBlogs">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="WangYingGangBlogs">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          mysql安装使用问题
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">Posted on</span>
+
+              <time title="Created: 2021-10-10 23:45:55" itemprop="dateCreated datePublished" datetime="2021-10-10T23:45:55+08:00">2021-10-10</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">Edited on</span>
+                <time title="Modified: 2022-04-11 00:43:12" itemprop="dateModified" datetime="2022-04-11T00:43:12+08:00">2022-04-11</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">In</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/mysql/" itemprop="url" rel="index"><span itemprop="name">mysql</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="sql语句"><a href="#sql语句" class="headerlink" title="sql语句"></a>sql语句</h2><p>暂未整理</p>
+<h2 id="mysql安装使用问题"><a href="#mysql安装使用问题" class="headerlink" title="mysql安装使用问题"></a>mysql安装使用问题</h2><h3 id="1-不允许远程连接"><a href="#1-不允许远程连接" class="headerlink" title="1.不允许远程连接"></a>1.不允许远程连接</h3><p>方法一：</p>
+<ul>
+<li><p>问题描述</p>
+<p>Host ‘xxx’ is not allowed to connect to this MySQL server 1130-主机‘xxx’不允许连接到此MySQL服务器</p>
+</li>
+</ul>
+<p><strong>步骤一</strong> 登陆</p>
+<p>mysql -u root -p</p>
+<p><strong>步骤二</strong> 查询user表</p>
+<p>use mysql;</p>
+<p>select host from user where user&#x3D;’root’;</p>
+<p>可以看到当前主机配置信息为localhost.</p>
+<p><strong>步骤三</strong>.将Host设置为通配符%</p>
+<p>Host列指定了允许用户登录所使用的IP，比如user&#x3D;root Host&#x3D;192.168.1.1。这里的意思就是说root用户只能通过192.168.1.1的客户端去访问。 user&#x3D;root Host&#x3D;localhost，表示只能通过本机客户端去访问。而%是个通配符，如果Host&#x3D;192.168.1.%，那么就表示只要是IP地址前缀为“192.168.1.”的客户端都可以连接。如果Host&#x3D;%，表示所有IP都有连接权限。 </p>
+<p>注意：在生产环境下不能为了省事将host设置为%，这样做会存在安全问题，具体的设置可以根据<strong>生产环境的IP进行设置</strong>；</p>
+<p>update user set host &#x3D; ‘%’ where user &#x3D;’root’;</p>
+<p>Host设置了“%”后便可以允许远程访问。</p>
+<p><strong>步骤四</strong>.Host修改完成后记得执行flush privileges使配置立即生效</p>
+<p>flush privileges;</p>
+<p>6.使用navicat 成功连接至mysql</p>
+<p>方法二：</p>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">grant</span> <span class="keyword">all</span> privileges <span class="keyword">on</span> <span class="operator">*</span>.<span class="operator">*</span> <span class="keyword">to</span> <span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;%&#x27;</span> identified <span class="keyword">by</span> <span class="string">&#x27;123456&#x27;</span> <span class="keyword">with</span> <span class="keyword">grant</span> option;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>h或者</p>
+<pre><code>//授权
+grant all privileges on *.* to &#39;root&#39; @&#39;%&#39; identified by &#39;密码&#39;;
+
+//刷新
+flush privileges;
+</code></pre>
+<h3 id="2-修改mysql密码"><a href="#2-修改mysql密码" class="headerlink" title="2.修改mysql密码"></a>2.修改mysql密码</h3><h4 id="知道密码"><a href="#知道密码" class="headerlink" title="知道密码"></a>知道密码</h4><p>在清楚的知道密码的情况之下可以使用以下几种方式修改MySQL的密码。</p>
+<p><strong>方式一</strong></p>
+<blockquote>
+<p>登录mysql执行以下语句</p>
+</blockquote>
+<figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql <span class="operator">-</span>u root <span class="operator">-</span>p</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>按回车确认, 如果安装正确且 MySQL 正在运行, 会得到以下响应:</p>
+</blockquote>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Enter password: xxx</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>若密码存在, 输入密码登录, 不存在则直接按回车登录。登录成功后你将会看到 Welcome to the MySQL monitor… 的提示语。</p>
+</blockquote>
+<p>修改密码</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">use mysql;</span><br><span class="line">ALTER USER <span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED BY <span class="string">&#x27;123456&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>出现Query OK, 0 rows affected (0.36 sec)，表示修改成功。</p>
+</blockquote>
+<p>报错  ERROR 1396 (HY000): Operation ALTER USER failed for ‘root‘@’localhost’</p>
+<p>mysql&gt; use mysql;<br>mysql&gt; select user,host from user;<br>+——————+———–+<br>| user             | host      |<br>+——————+———–+<br>| root             | %         |<br>| admin            | localhost |<br>| mysql.infoschema | localhost |<br>| mysql.session    | localhost |<br>| mysql.sys        | localhost |<br>| zhangj           | localhost |<br>+——————+———–+<br>注意我的root，host是’%’</p>
+<p>你可能执行的是:</p>
+<p>ALTER USER ‘root‘@’localhost’ IDENTIFIED WITH mysql_native_password BY ‘123’;<br>改成:</p>
+<p>ALTER USER ‘root‘@’%’ IDENTIFIED WITH mysql_native_password BY ‘123’;</p>
+<p> <strong>方式二</strong></p>
+<p><strong>通过mysqladmin修改密码</strong></p>
+<p>root 用户可以使用 mysqladmin 命令来修改密码，mysqladmin 的语法格式如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqladmin -u username -h hostname -p password <span class="string">&quot;newpwd&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p>语法参数说明如下：</p>
+<ul>
+<li>usermame 指需要修改密码的用户名称，在这里指定为 root 用户；</li>
+<li>hostname 指需要修改密码的用户主机名，该参数可以不写，默认是 localhost；</li>
+<li>password 为关键字，而不是指旧密码；</li>
+<li>newpwd 为新设置的密码，必须用双引号括起来。如果使用单引号会引发错误，可能会造成修改后的密码不是你想要的。</li>
+</ul>
+<p><img src="/mysql/20210620124108836.png" alt="img"></p>
+<p>警告：由于密码将以明文形式发送到服务器，请使用ssl连接以确保密码安全。</p>
+<p>提示的这部分就不用管了。 </p>
+<p>修改完成。</p>
+<h4 id="忘记密码"><a href="#忘记密码" class="headerlink" title="忘记密码"></a>忘记密码</h4><p>在忘记密码的情况下如何强制修改密码，我在此提供一种办法。</p>
+<blockquote>
+<ol>
+<li>以超级管理员打开cmd，关闭mysql服务</li>
+</ol>
+</blockquote>
+<figure class="highlight vbnet"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net <span class="keyword">stop</span> mysql</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="2">
+<li>跳过权限验证登录mysql</li>
+</ol>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysqld --shared-memory --skip-grant-tables</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="3">
+<li>在新的窗口中登录mysql</li>
+</ol>
+</blockquote>
+<p>使用命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -u root -p</span><br></pre></td></tr></table></figure>
+
+<p>无需输入密码，直接回车即可。</p>
+<blockquote>
+<ol start="4">
+<li>切换到mysql，将密码置空。</li>
+</ol>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">use mysql;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">update user <span class="built_in">set</span> authentication_string=<span class="string">&#x27;&#x27;</span> <span class="built_in">where</span> user=<span class="string">&#x27;root&#x27;</span>;</span><br></pre></td></tr></table></figure>
+
+<p>然后刷新权限:</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="5">
+<li>设置加密规则并更新新密码，授权(直接复制这些SQL语句你的密码会更新为123456)</li>
+</ol>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">ALTER USER <span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> IDENTIFIED BY <span class="string">&#x27;123456&#x27;</span> PASSWORD EXPIRE NEVER; </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">alter user <span class="string">&#x27;root&#x27;</span>@<span class="string">&#x27;localhost&#x27;</span> identified by <span class="string">&#x27;123456&#x27;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">grant all privileges  on *.*  to <span class="string">&quot;root&quot;</span>@<span class="string">&#x27;localhost&#x27;</span>;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">flush privileges;</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<ol start="6">
+<li>设置成功后，重启mysql服务，使用新密码登录</li>
+</ol>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">net start mysql</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/mysql/" rel="tag"># mysql</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/10/05/Java/%E6%8E%A5%E5%8F%A3%E5%B9%82%E7%AD%89%E6%80%A7%E5%A4%84%E7%90%86/%E6%8E%A5%E5%8F%A3%E5%B9%82%E7%AD%89%E6%80%A7/" rel="prev" title="接口幂等性">
+      <i class="fa fa-chevron-left"></i> 接口幂等性
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/10/19/Java/redis-%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/%E5%B8%83%E9%9A%86%E8%BF%87%E6%BB%A4%E5%99%A8/" rel="next" title="布隆过滤器">
+      布隆过滤器 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          Table of Contents
+        </li>
+        <li class="sidebar-nav-overview">
+          Overview
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#sql%E8%AF%AD%E5%8F%A5"><span class="nav-number">1.</span> <span class="nav-text">sql语句</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#mysql%E5%AE%89%E8%A3%85%E4%BD%BF%E7%94%A8%E9%97%AE%E9%A2%98"><span class="nav-number">2.</span> <span class="nav-text">mysql安装使用问题</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%B8%8D%E5%85%81%E8%AE%B8%E8%BF%9C%E7%A8%8B%E8%BF%9E%E6%8E%A5"><span class="nav-number">2.1.</span> <span class="nav-text">1.不允许远程连接</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BF%AE%E6%94%B9mysql%E5%AF%86%E7%A0%81"><span class="nav-number">2.2.</span> <span class="nav-text">2.修改mysql密码</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%9F%A5%E9%81%93%E5%AF%86%E7%A0%81"><span class="nav-number">2.2.1.</span> <span class="nav-text">知道密码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%BF%98%E8%AE%B0%E5%AF%86%E7%A0%81"><span class="nav-number">2.2.2.</span> <span class="nav-text">忘记密码</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">WangYingGangBlogs</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">51</span>
+          <span class="site-state-item-name">posts</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+        <span class="site-state-item-count">36</span>
+        <span class="site-state-item-name">categories</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">33</span>
+        <span class="site-state-item-name">tags</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">WangYingGangBlogs</span>
+</div>
+  <div class="powered-by">Powered by <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://muse.theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Muse</a>
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/muse.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
