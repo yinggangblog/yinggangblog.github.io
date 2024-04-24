@@ -1467,101 +1467,6 @@
       </tags>
   </entry>
   <entry>
-    <title>ThreadLocal的使用</title>
-    <url>/2021/04/21/Java/ThreadLocal%E7%9A%84%E4%BD%BF%E7%94%A8/ThreadLocal/</url>
-    <content><![CDATA[<h2 id="ThreadLocal在工作中的使用"><a href="#ThreadLocal在工作中的使用" class="headerlink" title="ThreadLocal在工作中的使用"></a>ThreadLocal在工作中的使用</h2><h3 id="线程池工具类"><a href="#线程池工具类" class="headerlink" title="线程池工具类"></a>线程池工具类</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 线程池工厂工具</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadPoolFactory</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生成固定大小的线程池</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> threadName 线程名称</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 线程池</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title function_">createFixedThreadPool</span><span class="params">(String threadName)</span> &#123;</span><br><span class="line">        <span class="type">AtomicInteger</span> <span class="variable">threadNumber</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AtomicInteger</span>(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">                <span class="comment">// 核心线程数</span></span><br><span class="line">                desiredThreadNum(),</span><br><span class="line">                <span class="comment">// 最大线程数</span></span><br><span class="line">                desiredThreadNum(),</span><br><span class="line">                <span class="comment">// 空闲线程存活时间</span></span><br><span class="line">                <span class="number">60L</span>,</span><br><span class="line">                <span class="comment">// 空闲线程存活时间单位</span></span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                <span class="comment">// 工作队列</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">1024</span>),</span><br><span class="line">                <span class="comment">// 线程工厂</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ThreadFactory</span>() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> Thread <span class="title function_">newThread</span><span class="params">(Runnable r)</span> &#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(r, threadName + <span class="string">&quot;-&quot;</span> + threadNumber.getAndIncrement());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="comment">// 拒绝策略</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">RejectedExecutionHandler</span>() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor executor)</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (!executor.isShutdown()) &#123;</span><br><span class="line">                            <span class="keyword">try</span> &#123;</span><br><span class="line">                                <span class="comment">//尝试阻塞式加入任务队列</span></span><br><span class="line">                                executor.getQueue().put(r);</span><br><span class="line">                            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                                <span class="comment">//保持线程的中断状态</span></span><br><span class="line">                                Thread.currentThread().interrupt();</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 理想的线程数，使用 2倍cpu核心数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">desiredThreadNum</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Runtime.getRuntime().availableProcessors() * <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="主程序"><a href="#主程序" class="headerlink" title="主程序"></a>主程序</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadLocalTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">ExecutorService</span> <span class="variable">threadPoolExecutor</span> <span class="operator">=</span> ThreadPoolFactory.createFixedThreadPool(<span class="string">&quot;格式化时间&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; ThreadPoolFactory.desiredThreadNum(); i++) &#123;</span><br><span class="line">            threadPoolExecutor.execute(</span><br><span class="line">                    ()-&gt; System.out.println(DateUtilNotSafe.parse(<span class="string">&quot;2019-06-01 16:34:30&quot;</span>))</span><br><span class="line">            );</span><br><span class="line">        &#125;</span><br><span class="line">        threadPoolExecutor.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="时间格式工具类"><a href="#时间格式工具类" class="headerlink" title="时间格式工具类"></a>时间格式工具类</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.text.ParseException;</span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DateUtilNotSafe</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">SimpleDateFormat</span> <span class="variable">sdf</span> <span class="operator">=</span></span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">SimpleDateFormat</span>(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Date <span class="title function_">parse</span><span class="params">(String dateStr)</span> &#123;</span><br><span class="line">        <span class="type">Date</span> <span class="variable">date</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            date = sdf.parse(dateStr);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ParseException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> date;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p><strong>报错</strong></p>
-<p><img src="/ThreadLocal/image-20220214170920634.png" alt="image-20220214170920634"></p>
-<h3 id="ThreadLocal解决"><a href="#ThreadLocal解决" class="headerlink" title="ThreadLocal解决"></a>ThreadLocal解决</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.text.DateFormat;</span><br><span class="line"><span class="keyword">import</span> java.text.ParseException;</span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DateUtilSafe</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;DateFormat&gt; THREAD_LOCAL = ThreadLocal.withInitial(</span><br><span class="line">            () -&gt; <span class="keyword">new</span> <span class="title class_">SimpleDateFormat</span>(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Date <span class="title function_">parse</span><span class="params">(String dateStr)</span> &#123;</span><br><span class="line">        <span class="type">Date</span> <span class="variable">date</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            date = THREAD_LOCAL.get().parse(dateStr);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ParseException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> date;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<p><strong>分析：</strong></p>
-<p>SimpleDateFormat(下面简称sdf)类内部有一个Calendar对象引用，它用来储存和这个sdf相关的日期信息，例如sdf.parse(dateStr), sdf.format(date) 诸如此类的方法参数传入的日期相关String、Date等等，都是交友Calendar引用来储存的，这样就会导致一个问题，如果你的sdf是个static的, 那么多个thread 之间就会共享这个sdf， 同时也是共享这个Calendar引用， 并且, 观察 sdf.parse() 方法，parse方法里没有保证原子性，所以存在线程安全问题：</p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Date <span class="title function_">parse</span><span class="params">()</span> &#123;</span><br><span class="line">  calendar.clear(); <span class="comment">// 清理calendar</span></span><br><span class="line">  ... <span class="comment">// 执行一些操作, 设置 calendar 的日期什么的</span></span><br><span class="line">  calendar.getTime(); <span class="comment">// 获取calendar的时间</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>既然是因为多个线程共享SimpleDateFormat造成的，那么我们就让它不共享，每个线程存一份自己的SimpleDateFormat对象。自己玩自己的对象，就不会出现线程问题了。ThreadLocal作用就是让线程自己独立保存一份自己的变量副本。每个线程独立的使用自己的变量副本，不会影响其他线程内的变量副本。</p>
-<h2 id="ThreadLocal简介"><a href="#ThreadLocal简介" class="headerlink" title="ThreadLocal简介"></a><strong>ThreadLocal简介</strong></h2><p>ThreadLocal不是多线程同步机制的一种，他是为多线程环境下为变量线程安全提供的一种解决思路，他是解决多线程下<strong>成员变量的安全问题</strong>，不是解决多线程下共享变量的安全问题。</p>
-<p>线程同步机制是多个线程共享一个变量，而ThreadLocal是每个线程创建一个自己的单独变量副本，所以每个线程都可以独立的改变自己的变量副本。并且不会影响其他线程的变量副本。</p>
-<h2 id="ThreadLocalMap"><a href="#ThreadLocalMap" class="headerlink" title="ThreadLocalMap"></a><strong>ThreadLocalMap</strong></h2><p>ThreadLocal内部有一个非常重要的内部类：ThreadLocalMap，该类才是真正实现线程隔离机制的关键，ThreadLocalMap内部结构类似于map，由键值对key和value组成一个Entry，key为ThreadLocal本身，value是对应的线程变量副本</p>
-<p>注意：</p>
-<p>1、ThreadLocal本身不存储值，他只是提供一个查找到值的key给你。</p>
-<p>2、ThreadLocal包含在Thread中，不是Thread包含在ThreadLocal中。</p>
-<p><strong>ThreadLocalMap 和HashMap的功能类似，但是实现上却有很大的不同：</strong></p>
-<ol>
-<li><p>HashMap 的数据结构是数组+链表+1.8红黑树。 ThreadLocalMap的数据结构仅仅是数组</p>
-</li>
-<li><p>HashMap 是通过链地址法解决hash 冲突的问题。ThreadLocalMap 是通过开放地址法来解决hash 冲突的问题</p>
-<p><strong>链地址法</strong></p>
-<p>这种方法的基本思想是将所有哈希地址为i的元素构成一个称为同义词链的单链表，并将单链表的头指针存在哈希表的第i个单元中，因而查找、插入和删除主要在同义词链中进行。</p>
-<p><strong>开放地址法</strong></p>
-<p>这种方法的基本思想是一旦发生了冲突，就去**寻找下一个空的散列地址(这非常重要，源码都是根据这个特性，必须理解这里才能往下走)**，只要散列表足够大，空的散列地址总能找到，并将记录存入。</p>
-</li>
-<li><p>HashMap 里面的Entry 内部类的引用都是强引用。ThreadLocalMap里面的Entry 内部类中的key 是弱引用，value 是强引用</p>
-</li>
-</ol>
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="链地址法和开放地址法的优缺点"><a href="#链地址法和开放地址法的优缺点" class="headerlink" title="链地址法和开放地址法的优缺点"></a><strong>链地址法和开放地址法的优缺点</strong></h3><p><strong>链地址法：</strong></p>
-<ol>
-<li>处理冲突简单，且无堆积现象，平均查找长度短。</li>
-<li>链表中的结点是动态申请的，适合构造表不能确定长度的情况。</li>
-<li>删除结点的操作易于实现。只要简单地删去链表上相应的结点即可。</li>
-<li>指针需要额外的空间，故当结点规模较小时，开放定址法较为节省空间。</li>
-</ol>
-<p><strong>开放地址法：</strong>(出现冲突时顺着这个值往后找 找一个没有值的放下去)</p>
-<ol>
-<li>容易产生<strong>堆积问题</strong>，不适于大规模的数据存储。</li>
-<li>散列函数的设计对冲突会有很大的影响，插入时可能会出现多次冲突的现象。</li>
-<li>删除的元素是多个冲突元素中的一个，需要对后面的元素作处理，实现较复杂。</li>
-</ol>
-<p><strong>ThreadLocalMap 采用开放地址法原因</strong></p>
-<ol>
-<li>ThreadLocal 中看到一个属性 HASH_INCREMENT &#x3D; 0x61c88647 ，0x61c88647 是一个神奇的数字，让哈希码能均匀的分布在2的N次方的数组里, 即 Entry[] table，关于这个神奇的数字google 有很多解析，。</li>
-<li>ThreadLocal 往往存放的<strong>数据量不会特别大</strong>（而且<strong>key 是弱引用又会被垃圾回收</strong>，及时让数据量更小），这个时候开放地址法简单的结构会<strong>显得更省空间</strong>，同时数组的查询效率也是非常高，加上第一点的保障，冲突概率也低</li>
-</ol>
-<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><h3 id="Thread、ThreadLocal、ThreadLocalMap之间的关系"><a href="#Thread、ThreadLocal、ThreadLocalMap之间的关系" class="headerlink" title="Thread、ThreadLocal、ThreadLocalMap之间的关系"></a><strong>Thread、ThreadLocal、ThreadLocalMap之间的关系</strong></h3><p>每个Thread线程内部都有一个Map。Map里面存储线程本地对象（key）和线程的变量副本（value）Thread内部的Map是由ThreadLocal维护的，由ThreadLocal负责向map获取和设置线程的变量值。所以对于不同的线程，每次获取副本值时，别的线程并不能获取到当前线程的副本值，形成了副本的隔离，彼此之间互不干扰。</p>
-<h2 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a><strong>源码解读</strong></h2><h3 id="先了解一下ThreadLocal类提供的几个方法："><a href="#先了解一下ThreadLocal类提供的几个方法：" class="headerlink" title="先了解一下ThreadLocal类提供的几个方法："></a><strong>先了解一下ThreadLocal类提供的几个方法：</strong></h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> T <span class="title function_">get</span><span class="params">()</span> &#123; &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">set</span><span class="params">(T value)</span> &#123; &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">()</span> &#123; &#125;</span><br><span class="line"><span class="keyword">protected</span> T <span class="title function_">initialValue</span><span class="params">()</span> &#123; &#125;</span><br></pre></td></tr></table></figure>
-
-<p>get()方法是用来获取ThreadLocal在当前线程中保存的变量副本。<br>set()用来设置当前线程中变量的副本。<br>remove()用来移除当前线程中变量的副本。<br>initialValue()是一个protected方法，一般是用来在使用时进行重写的</p>
-<h3 id="-2"><a href="#-2" class="headerlink" title=""></a></h3><h3 id="内存泄露问题："><a href="#内存泄露问题：" class="headerlink" title="内存泄露问题："></a>内存泄露问题：</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; &#123;</span><br><span class="line">    /** The value associated with this ThreadLocal. */</span><br><span class="line">    Object value;</span><br><span class="line"> </span><br><span class="line">    Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">        super(k);</span><br><span class="line">        value = v;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>从上面源码可以看出，ThreadLocalMap使用ThreadLocal的弱引用作为Entry的key，如果一个ThreadLocal没有外部强引用来引用它，下一次系统GC时，这个ThreadLocal必然会被回收，这样一来，ThreadLocalMap中就会出现key为null的Entry，就没有办法访问这些key为null的Entry的value。</p>
-<p>我们上面介绍的get、set、remove等方法中，都会对key为null的Entry进行清除（expungeStaleEntry方法，将Entry的value清空，等下一次垃圾回收时，这些Entry将会被彻底回收）。</p>
-<p>但是如果当前线程一直在运行，并且一直不执行get、set、remove方法，这些key为null的Entry的value就会一直存在一条强引用练：Thread Ref -&gt; Thread -&gt; ThreadLocalMap -&gt; Entry -&gt; value，导致这些key为null的Entry的value永远无法回收，造成内存泄漏。</p>
-<p>如何避免内存泄漏？<br>为了避免这种情况，我们可以在使用完ThreadLocal后，手动调用remove方法，以避免出现内存泄漏。</p>
-<h2 id="ThreadLocal使用"><a href="#ThreadLocal使用" class="headerlink" title="ThreadLocal使用"></a>ThreadLocal使用</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> com.greate.community.entity.User;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 持有用户信息(多线程)，用于代替 session 对象</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HostHolder</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ThreadLocal&lt;User&gt; users = <span class="keyword">new</span> <span class="title class_">ThreadLocal</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 存储 User</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        users.set(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取 User</span></span><br><span class="line">    <span class="keyword">public</span> User <span class="title function_">getUser</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> users.get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清理</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">clear</span><span class="params">()</span> &#123;</span><br><span class="line">        users.remove();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
-
-
-
-
-]]></content>
-      <categories>
-        <category>多线程</category>
-      </categories>
-      <tags>
-        <tag>多线程</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>Sentinel的使用笔记</title>
     <url>/2021/10/21/Java/SpringCloud%20Alibaba/Sentinel/</url>
     <content><![CDATA[<h3 id="SpringCloud-Alibaba-Sentinel"><a href="#SpringCloud-Alibaba-Sentinel" class="headerlink" title="SpringCloud Alibaba-Sentinel"></a>SpringCloud Alibaba-Sentinel</h3><h4 id="1、简介"><a href="#1、简介" class="headerlink" title="1、简介"></a>1、简介</h4><h5 id="1、服务降级限流"><a href="#1、服务降级限流" class="headerlink" title="1、服务降级限流"></a>1、服务降级限流</h5><p><strong>熔断：</strong></p>
@@ -1726,6 +1631,101 @@
       </categories>
       <tags>
         <tag>SpringCloud</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>ThreadLocal的使用</title>
+    <url>/2021/04/21/Java/ThreadLocal%E7%9A%84%E4%BD%BF%E7%94%A8/ThreadLocal/</url>
+    <content><![CDATA[<h2 id="ThreadLocal在工作中的使用"><a href="#ThreadLocal在工作中的使用" class="headerlink" title="ThreadLocal在工作中的使用"></a>ThreadLocal在工作中的使用</h2><h3 id="线程池工具类"><a href="#线程池工具类" class="headerlink" title="线程池工具类"></a>线程池工具类</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.*;</span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicInteger;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 线程池工厂工具</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadPoolFactory</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 生成固定大小的线程池</span></span><br><span class="line"><span class="comment">     *</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@param</span> threadName 线程名称</span></span><br><span class="line"><span class="comment">     * <span class="doctag">@return</span> 线程池</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title function_">createFixedThreadPool</span><span class="params">(String threadName)</span> &#123;</span><br><span class="line">        <span class="type">AtomicInteger</span> <span class="variable">threadNumber</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">AtomicInteger</span>(<span class="number">0</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">ThreadPoolExecutor</span>(</span><br><span class="line">                <span class="comment">// 核心线程数</span></span><br><span class="line">                desiredThreadNum(),</span><br><span class="line">                <span class="comment">// 最大线程数</span></span><br><span class="line">                desiredThreadNum(),</span><br><span class="line">                <span class="comment">// 空闲线程存活时间</span></span><br><span class="line">                <span class="number">60L</span>,</span><br><span class="line">                <span class="comment">// 空闲线程存活时间单位</span></span><br><span class="line">                TimeUnit.SECONDS,</span><br><span class="line">                <span class="comment">// 工作队列</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ArrayBlockingQueue</span>&lt;&gt;(<span class="number">1024</span>),</span><br><span class="line">                <span class="comment">// 线程工厂</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">ThreadFactory</span>() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> Thread <span class="title function_">newThread</span><span class="params">(Runnable r)</span> &#123;</span><br><span class="line">                        <span class="keyword">return</span> <span class="keyword">new</span> <span class="title class_">Thread</span>(r, threadName + <span class="string">&quot;-&quot;</span> + threadNumber.getAndIncrement());</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;,</span><br><span class="line">                <span class="comment">// 拒绝策略</span></span><br><span class="line">                <span class="keyword">new</span> <span class="title class_">RejectedExecutionHandler</span>() &#123;</span><br><span class="line">                    <span class="meta">@Override</span></span><br><span class="line">                    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">rejectedExecution</span><span class="params">(Runnable r, ThreadPoolExecutor executor)</span> &#123;</span><br><span class="line">                        <span class="keyword">if</span> (!executor.isShutdown()) &#123;</span><br><span class="line">                            <span class="keyword">try</span> &#123;</span><br><span class="line">                                <span class="comment">//尝试阻塞式加入任务队列</span></span><br><span class="line">                                executor.getQueue().put(r);</span><br><span class="line">                            &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                                <span class="comment">//保持线程的中断状态</span></span><br><span class="line">                                Thread.currentThread().interrupt();</span><br><span class="line">                            &#125;</span><br><span class="line">                        &#125;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">     * 理想的线程数，使用 2倍cpu核心数</span></span><br><span class="line"><span class="comment">     */</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">int</span> <span class="title function_">desiredThreadNum</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> Runtime.getRuntime().availableProcessors() * <span class="number">2</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="主程序"><a href="#主程序" class="headerlink" title="主程序"></a>主程序</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.ExecutorService;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">ThreadLocalTest</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line"></span><br><span class="line">        <span class="type">ExecutorService</span> <span class="variable">threadPoolExecutor</span> <span class="operator">=</span> ThreadPoolFactory.createFixedThreadPool(<span class="string">&quot;格式化时间&quot;</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>; i &lt; ThreadPoolFactory.desiredThreadNum(); i++) &#123;</span><br><span class="line">            threadPoolExecutor.execute(</span><br><span class="line">                    ()-&gt; System.out.println(DateUtilNotSafe.parse(<span class="string">&quot;2019-06-01 16:34:30&quot;</span>))</span><br><span class="line">            );</span><br><span class="line">        &#125;</span><br><span class="line">        threadPoolExecutor.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="时间格式工具类"><a href="#时间格式工具类" class="headerlink" title="时间格式工具类"></a>时间格式工具类</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.text.ParseException;</span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DateUtilNotSafe</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">SimpleDateFormat</span> <span class="variable">sdf</span> <span class="operator">=</span></span><br><span class="line">            <span class="keyword">new</span> <span class="title class_">SimpleDateFormat</span>(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Date <span class="title function_">parse</span><span class="params">(String dateStr)</span> &#123;</span><br><span class="line">        <span class="type">Date</span> <span class="variable">date</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            date = sdf.parse(dateStr);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ParseException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> date;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><strong>报错</strong></p>
+<p><img src="/ThreadLocal/image-20220214170920634.png" alt="image-20220214170920634"></p>
+<h3 id="ThreadLocal解决"><a href="#ThreadLocal解决" class="headerlink" title="ThreadLocal解决"></a>ThreadLocal解决</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> com.example.demo;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.text.DateFormat;</span><br><span class="line"><span class="keyword">import</span> java.text.ParseException;</span><br><span class="line"><span class="keyword">import</span> java.text.SimpleDateFormat;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">DateUtilSafe</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> ThreadLocal&lt;DateFormat&gt; THREAD_LOCAL = ThreadLocal.withInitial(</span><br><span class="line">            () -&gt; <span class="keyword">new</span> <span class="title class_">SimpleDateFormat</span>(<span class="string">&quot;yyyy-MM-dd HH:mm:ss&quot;</span>)</span><br><span class="line">    );</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> Date <span class="title function_">parse</span><span class="params">(String dateStr)</span> &#123;</span><br><span class="line">        <span class="type">Date</span> <span class="variable">date</span> <span class="operator">=</span> <span class="literal">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            date = THREAD_LOCAL.get().parse(dateStr);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (ParseException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> date;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p><strong>分析：</strong></p>
+<p>SimpleDateFormat(下面简称sdf)类内部有一个Calendar对象引用，它用来储存和这个sdf相关的日期信息，例如sdf.parse(dateStr), sdf.format(date) 诸如此类的方法参数传入的日期相关String、Date等等，都是交友Calendar引用来储存的，这样就会导致一个问题，如果你的sdf是个static的, 那么多个thread 之间就会共享这个sdf， 同时也是共享这个Calendar引用， 并且, 观察 sdf.parse() 方法，parse方法里没有保证原子性，所以存在线程安全问题：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Date <span class="title function_">parse</span><span class="params">()</span> &#123;</span><br><span class="line">  calendar.clear(); <span class="comment">// 清理calendar</span></span><br><span class="line">  ... <span class="comment">// 执行一些操作, 设置 calendar 的日期什么的</span></span><br><span class="line">  calendar.getTime(); <span class="comment">// 获取calendar的时间</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>既然是因为多个线程共享SimpleDateFormat造成的，那么我们就让它不共享，每个线程存一份自己的SimpleDateFormat对象。自己玩自己的对象，就不会出现线程问题了。ThreadLocal作用就是让线程自己独立保存一份自己的变量副本。每个线程独立的使用自己的变量副本，不会影响其他线程内的变量副本。</p>
+<h2 id="ThreadLocal简介"><a href="#ThreadLocal简介" class="headerlink" title="ThreadLocal简介"></a><strong>ThreadLocal简介</strong></h2><p>ThreadLocal不是多线程同步机制的一种，他是为多线程环境下为变量线程安全提供的一种解决思路，他是解决多线程下<strong>成员变量的安全问题</strong>，不是解决多线程下共享变量的安全问题。</p>
+<p>线程同步机制是多个线程共享一个变量，而ThreadLocal是每个线程创建一个自己的单独变量副本，所以每个线程都可以独立的改变自己的变量副本。并且不会影响其他线程的变量副本。</p>
+<h2 id="ThreadLocalMap"><a href="#ThreadLocalMap" class="headerlink" title="ThreadLocalMap"></a><strong>ThreadLocalMap</strong></h2><p>ThreadLocal内部有一个非常重要的内部类：ThreadLocalMap，该类才是真正实现线程隔离机制的关键，ThreadLocalMap内部结构类似于map，由键值对key和value组成一个Entry，key为ThreadLocal本身，value是对应的线程变量副本</p>
+<p>注意：</p>
+<p>1、ThreadLocal本身不存储值，他只是提供一个查找到值的key给你。</p>
+<p>2、ThreadLocal包含在Thread中，不是Thread包含在ThreadLocal中。</p>
+<p><strong>ThreadLocalMap 和HashMap的功能类似，但是实现上却有很大的不同：</strong></p>
+<ol>
+<li><p>HashMap 的数据结构是数组+链表+1.8红黑树。 ThreadLocalMap的数据结构仅仅是数组</p>
+</li>
+<li><p>HashMap 是通过链地址法解决hash 冲突的问题。ThreadLocalMap 是通过开放地址法来解决hash 冲突的问题</p>
+<p><strong>链地址法</strong></p>
+<p>这种方法的基本思想是将所有哈希地址为i的元素构成一个称为同义词链的单链表，并将单链表的头指针存在哈希表的第i个单元中，因而查找、插入和删除主要在同义词链中进行。</p>
+<p><strong>开放地址法</strong></p>
+<p>这种方法的基本思想是一旦发生了冲突，就去**寻找下一个空的散列地址(这非常重要，源码都是根据这个特性，必须理解这里才能往下走)**，只要散列表足够大，空的散列地址总能找到，并将记录存入。</p>
+</li>
+<li><p>HashMap 里面的Entry 内部类的引用都是强引用。ThreadLocalMap里面的Entry 内部类中的key 是弱引用，value 是强引用</p>
+</li>
+</ol>
+<h3 id=""><a href="#" class="headerlink" title=""></a></h3><h3 id="链地址法和开放地址法的优缺点"><a href="#链地址法和开放地址法的优缺点" class="headerlink" title="链地址法和开放地址法的优缺点"></a><strong>链地址法和开放地址法的优缺点</strong></h3><p><strong>链地址法：</strong></p>
+<ol>
+<li>处理冲突简单，且无堆积现象，平均查找长度短。</li>
+<li>链表中的结点是动态申请的，适合构造表不能确定长度的情况。</li>
+<li>删除结点的操作易于实现。只要简单地删去链表上相应的结点即可。</li>
+<li>指针需要额外的空间，故当结点规模较小时，开放定址法较为节省空间。</li>
+</ol>
+<p><strong>开放地址法：</strong>(出现冲突时顺着这个值往后找 找一个没有值的放下去)</p>
+<ol>
+<li>容易产生<strong>堆积问题</strong>，不适于大规模的数据存储。</li>
+<li>散列函数的设计对冲突会有很大的影响，插入时可能会出现多次冲突的现象。</li>
+<li>删除的元素是多个冲突元素中的一个，需要对后面的元素作处理，实现较复杂。</li>
+</ol>
+<p><strong>ThreadLocalMap 采用开放地址法原因</strong></p>
+<ol>
+<li>ThreadLocal 中看到一个属性 HASH_INCREMENT &#x3D; 0x61c88647 ，0x61c88647 是一个神奇的数字，让哈希码能均匀的分布在2的N次方的数组里, 即 Entry[] table，关于这个神奇的数字google 有很多解析，。</li>
+<li>ThreadLocal 往往存放的<strong>数据量不会特别大</strong>（而且<strong>key 是弱引用又会被垃圾回收</strong>，及时让数据量更小），这个时候开放地址法简单的结构会<strong>显得更省空间</strong>，同时数组的查询效率也是非常高，加上第一点的保障，冲突概率也低</li>
+</ol>
+<h3 id="-1"><a href="#-1" class="headerlink" title=""></a></h3><h3 id="Thread、ThreadLocal、ThreadLocalMap之间的关系"><a href="#Thread、ThreadLocal、ThreadLocalMap之间的关系" class="headerlink" title="Thread、ThreadLocal、ThreadLocalMap之间的关系"></a><strong>Thread、ThreadLocal、ThreadLocalMap之间的关系</strong></h3><p>每个Thread线程内部都有一个Map。Map里面存储线程本地对象（key）和线程的变量副本（value）Thread内部的Map是由ThreadLocal维护的，由ThreadLocal负责向map获取和设置线程的变量值。所以对于不同的线程，每次获取副本值时，别的线程并不能获取到当前线程的副本值，形成了副本的隔离，彼此之间互不干扰。</p>
+<h2 id="源码解读"><a href="#源码解读" class="headerlink" title="源码解读"></a><strong>源码解读</strong></h2><h3 id="先了解一下ThreadLocal类提供的几个方法："><a href="#先了解一下ThreadLocal类提供的几个方法：" class="headerlink" title="先了解一下ThreadLocal类提供的几个方法："></a><strong>先了解一下ThreadLocal类提供的几个方法：</strong></h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> T <span class="title function_">get</span><span class="params">()</span> &#123; &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">set</span><span class="params">(T value)</span> &#123; &#125;</span><br><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">remove</span><span class="params">()</span> &#123; &#125;</span><br><span class="line"><span class="keyword">protected</span> T <span class="title function_">initialValue</span><span class="params">()</span> &#123; &#125;</span><br></pre></td></tr></table></figure>
+
+<p>get()方法是用来获取ThreadLocal在当前线程中保存的变量副本。<br>set()用来设置当前线程中变量的副本。<br>remove()用来移除当前线程中变量的副本。<br>initialValue()是一个protected方法，一般是用来在使用时进行重写的</p>
+<h3 id="-2"><a href="#-2" class="headerlink" title=""></a></h3><h3 id="内存泄露问题："><a href="#内存泄露问题：" class="headerlink" title="内存泄露问题："></a>内存泄露问题：</h3><figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">static class Entry extends WeakReference&lt;ThreadLocal&lt;?&gt;&gt; &#123;</span><br><span class="line">    /** The value associated with this ThreadLocal. */</span><br><span class="line">    Object value;</span><br><span class="line"> </span><br><span class="line">    Entry(ThreadLocal&lt;?&gt; k, Object v) &#123;</span><br><span class="line">        super(k);</span><br><span class="line">        value = v;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>从上面源码可以看出，ThreadLocalMap使用ThreadLocal的弱引用作为Entry的key，如果一个ThreadLocal没有外部强引用来引用它，下一次系统GC时，这个ThreadLocal必然会被回收，这样一来，ThreadLocalMap中就会出现key为null的Entry，就没有办法访问这些key为null的Entry的value。</p>
+<p>我们上面介绍的get、set、remove等方法中，都会对key为null的Entry进行清除（expungeStaleEntry方法，将Entry的value清空，等下一次垃圾回收时，这些Entry将会被彻底回收）。</p>
+<p>但是如果当前线程一直在运行，并且一直不执行get、set、remove方法，这些key为null的Entry的value就会一直存在一条强引用练：Thread Ref -&gt; Thread -&gt; ThreadLocalMap -&gt; Entry -&gt; value，导致这些key为null的Entry的value永远无法回收，造成内存泄漏。</p>
+<p>如何避免内存泄漏？<br>为了避免这种情况，我们可以在使用完ThreadLocal后，手动调用remove方法，以避免出现内存泄漏。</p>
+<h2 id="ThreadLocal使用"><a href="#ThreadLocal使用" class="headerlink" title="ThreadLocal使用"></a>ThreadLocal使用</h2><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> com.greate.community.entity.User;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * 持有用户信息(多线程)，用于代替 session 对象</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">HostHolder</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ThreadLocal&lt;User&gt; users = <span class="keyword">new</span> <span class="title class_">ThreadLocal</span>&lt;&gt;();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 存储 User</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">setUser</span><span class="params">(User user)</span> &#123;</span><br><span class="line">        users.set(user);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 获取 User</span></span><br><span class="line">    <span class="keyword">public</span> User <span class="title function_">getUser</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> users.get();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 清理</span></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">clear</span><span class="params">()</span> &#123;</span><br><span class="line">        users.remove();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
+
+
+
+
+
+
+
+]]></content>
+      <categories>
+        <category>多线程</category>
+      </categories>
+      <tags>
+        <tag>多线程</tag>
       </tags>
   </entry>
   <entry>
@@ -2228,6 +2228,124 @@
       </tags>
   </entry>
   <entry>
+    <title>MinIO</title>
+    <url>/2020/11/20/Java/minio%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8/minio/</url>
+    <content><![CDATA[<h1 id=""><a href="#" class="headerlink" title=""></a></h1><blockquote>
+<p>常见的对象存储服务有阿里云的OSS对象存储、FastDFS分布式文件系统以及公司的私有云平台等等，以便于数据的存储和快速获取。但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的数据，这部分数据较为敏感，因此对于敏感数据的存储我们选择了使用兼容S3协议的开源分布式对象存储-<a href="https://so.csdn.net/so/search?q=Minio&spm=1001.2101.3001.7020">Minio</a>来进行自建服务。</p>
+</blockquote>
+<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><blockquote>
+<p>MinIO对象存储系统是为海量数据存储、人工智能、大数据分析而设计，基于Apache License v2.0开源协议的对象存储系统，它完全兼容Amazon S3接口，单个对象最大可达5TB，适合存储海量图片、视频、日志文件、备份数据和容器&#x2F;虚拟机镜像等。MinIO主要采用Golang语言实现，整个系统都运行在操作系统的用户态空间，客户端与存储服务器之间采用http&#x2F;https通信协议。</p>
+</blockquote>
+<p>中文文档方便学习Minio：<a href="http://docs.minio.org.cn/docs/master/minio-docker-quickstart-guide">http://docs.minio.org.cn/docs/master/minio-docker-quickstart-guide</a></p>
+<h2 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h2><h3 id="1-查询minio服务版本"><a href="#1-查询minio服务版本" class="headerlink" title="1.查询minio服务版本"></a>1.查询minio服务版本</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker search minio</span><br></pre></td></tr></table></figure>
+
+<p><img src="/minio/97b50b33713246528527163eb9e47421.png" alt="在这里插入图片描述"></p>
+<h3 id="2-拉取minio"><a href="#2-拉取minio" class="headerlink" title="2.拉取minio"></a>2.拉取minio</h3><h3 id="3-docker-hub下载其他版本"><a href="#3-docker-hub下载其他版本" class="headerlink" title="3. docker hub下载其他版本"></a>3. docker hub下载其他版本</h3><p><a href="https://hub.docker.com/r/minio/minio/tags?page=1&ordering=last_updated">https://hub.docker.com/r/minio/minio/tags?page=1&amp;ordering=last_updated</a></p>
+<p><strong>2021年6月17号的</strong>。<br><img src="/minio/1cb2ddcc346a4442a4f26b605d41cfb4.png" alt="在这里插入图片描述"></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">docker pull minio/minio:RELEASE<span class="number">.2021</span>-<span class="number">06</span>-17T00-<span class="number">10</span>-46Z</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-启动"><a href="#4-启动" class="headerlink" title="4. 启动"></a>4. 启动</h3><blockquote>
+<p>MinIO 需要一个持久卷来存储配置和应用数据。不过, 如果只是为了测试一下, 您可以通过简单地传递一个目录（在下面的示例中为&#x2F; data）启动MinIO。这个目录会在容器启动时在容器的文件系统中创建，不过所有的数据都会在容器退出时丢失。</p>
+</blockquote>
+<p>首先你的key 和 secret是重要的，就相当于你的账号密码，不要设置的那么简单，还有就是你的文件存放，假设服务宕机了，文件也不丢失，服务迁移了，文件也能跟着迁移，这才是工作中应当注意的地方。</p>
+<p><strong>要覆盖MinIO的自动生成的密钥，您可以将Access和Secret密钥设为环境变量。 MinIO允许常规字符串作为Access和Secret密钥。</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">docker run -d -p <span class="number">9000</span>:<span class="number">9000</span> --name minio\</span><br><span class="line">  -e <span class="string">&quot;MINIO_ACCESS_KEY=admin&quot;</span> \</span><br><span class="line">  -e <span class="string">&quot;MINIO_SECRET_KEY=1415479273@qq.com&quot;</span> \</span><br><span class="line">  -v /mydata/minio/data:/data \</span><br><span class="line">  -v /mydata/minio/config:/root/.minio \</span><br><span class="line">  minio/minio:RELEASE<span class="number">.2021</span>-<span class="number">06</span>-17T00-<span class="number">10</span>-46Z server /data</span><br></pre></td></tr></table></figure>
+
+
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/mydata/minio/data // 数据卷存放路径（自行添加）</span><br><span class="line">/mydata/minio/config //服务配置文件（自行添加）</span><br></pre></td></tr></table></figure>
+
+
+
+
+<p>上传文件成功之后，我们去到我们的服务data数据卷存储位置，查看文件是否存在。</p>
+<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="1-导入依赖"><a href="#1-导入依赖" class="headerlink" title="1.导入依赖"></a>1.导入依赖</h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.minio<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>minio<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="2-yml配置文件"><a href="#2-yml配置文件" class="headerlink" title="2.yml配置文件"></a>2.yml配置文件</h3><figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">9000</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">servlet:</span></span><br><span class="line">    <span class="attr">multipart:</span></span><br><span class="line">      <span class="attr">max-file-size:</span> <span class="string">100MB</span></span><br><span class="line">      <span class="attr">max-request-size:</span> <span class="string">1000MB</span></span><br><span class="line">      </span><br><span class="line"><span class="comment">#minio配置</span></span><br><span class="line"><span class="attr">minio:</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">http://8.144.162.164:9000</span>  <span class="comment">#对象存储服务的URL</span></span><br><span class="line">  <span class="attr">accessKey:</span> <span class="string">admin</span> <span class="comment">#Access key账户</span></span><br><span class="line">  <span class="attr">secretKey:</span> <span class="string">xxx</span>  <span class="comment">#Secret key密码</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="3-注入MinioClient"><a href="#3-注入MinioClient" class="headerlink" title="3.注入MinioClient"></a>3.注入MinioClient</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.config;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Value;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> io.minio.MinioClient;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MinioConfig</span> &#123;</span><br><span class="line">   </span><br><span class="line">   <span class="meta">@Value(&quot;$&#123;minio.url&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;minio.accessKey&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String accessKey;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;minio.secretKey&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String secretKey;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> MinioClient <span class="title function_">getMinioClient</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">MinioClient</span> <span class="variable">minioClient</span> <span class="operator">=</span> MinioClient.builder().endpoint(url)</span><br><span class="line">            .credentials(accessKey, secretKey).build();</span><br><span class="line">        <span class="keyword">return</span> minioClient;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="4-组件-MinioUtil"><a href="#4-组件-MinioUtil" class="headerlink" title="4.组件-MinioUtil"></a>4.组件-MinioUtil</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.util;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> boot.spring.domain.Fileinfo;</span><br><span class="line"><span class="keyword">import</span> io.minio.BucketExistsArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.GetObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.ListObjectsArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MakeBucketArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MinioClient;</span><br><span class="line"><span class="keyword">import</span> io.minio.PutObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.RemoveBucketArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.RemoveObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.Result;</span><br><span class="line"><span class="keyword">import</span> io.minio.messages.Bucket;</span><br><span class="line"><span class="keyword">import</span> io.minio.messages.Item;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MinioUtil</span> &#123;</span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> MinioClient minioClient;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 创建一个桶</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createBucket</span><span class="params">(String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="type">boolean</span> <span class="variable">found</span> <span class="operator">=</span> minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());</span><br><span class="line">      <span class="keyword">if</span> (!found) &#123;</span><br><span class="line">         minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 删除一个桶</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">deleteBucket</span><span class="params">(String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioClient.removeBucket(RemoveBucketArgs.builder().bucket(bucket).build());</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 列出所有的桶</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> List&lt;String&gt; <span class="title function_">listBuckets</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      List&lt;Bucket&gt; list = minioClient.listBuckets();</span><br><span class="line">      List&lt;String&gt; names = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">      list.forEach(b -&gt; &#123;</span><br><span class="line">         names.add(b.name());</span><br><span class="line">      &#125;);</span><br><span class="line">      <span class="keyword">return</span> names;</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 列出一个桶中的所有文件和目录</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> List&lt;Fileinfo&gt; <span class="title function_">listFiles</span><span class="params">(String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      Iterable&lt;Result&lt;Item&gt;&gt; results = minioClient.listObjects(</span><br><span class="line">             ListObjectsArgs.builder().bucket(bucket).recursive(<span class="literal">true</span>).build());</span><br><span class="line">         </span><br><span class="line">         List&lt;Fileinfo&gt; infos = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            results.forEach(r-&gt;&#123;</span><br><span class="line">               <span class="type">Fileinfo</span> <span class="variable">info</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Fileinfo</span>();</span><br><span class="line">               <span class="keyword">try</span> &#123;</span><br><span class="line">                  <span class="type">Item</span> <span class="variable">item</span> <span class="operator">=</span> r.get();</span><br><span class="line">                  info.setFilename(item.objectName());</span><br><span class="line">                  info.setDirectory(item.isDir());</span><br><span class="line">                  infos.add(info);</span><br><span class="line">               &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                  e.printStackTrace();</span><br><span class="line">               &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">      <span class="keyword">return</span> infos;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 上传一个文件</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">uploadFile</span><span class="params">(InputStream stream, String bucket, String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioClient.putObject(PutObjectArgs.builder().bucket(bucket).object(objectName)</span><br><span class="line">            .stream(stream, -<span class="number">1</span>, <span class="number">10485760</span>).build());</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 下载一个文件</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> InputStream <span class="title function_">download</span><span class="params">(String bucket, String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> minioClient.getObject(</span><br><span class="line">                    GetObjectArgs.builder().bucket(bucket).object(objectName).build());</span><br><span class="line">      <span class="keyword">return</span> stream;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 删除一个文件</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">deleteObject</span><span class="params">(String bucket, String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(objectName).build());</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-测试"><a href="#5-测试" class="headerlink" title="5.测试"></a>5.测试</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.service.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.security.InvalidKeyException;</span><br><span class="line"><span class="keyword">import</span> java.security.NoSuchAlgorithmException;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> boot.spring.service.MinIOService;</span><br><span class="line"><span class="keyword">import</span> io.minio.BucketExistsArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MakeBucketArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MinioClient;</span><br><span class="line"><span class="keyword">import</span> io.minio.PutObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.UploadObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.errors.MinioException;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service(&quot;minIOService&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MinIOServiceImpl</span> <span class="keyword">implements</span> <span class="title class_">MinIOService</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException, NoSuchAlgorithmException, InvalidKeyException &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">// Create a minioClient with the MinIO server playground, its access</span></span><br><span class="line">         <span class="comment">// key and secret key.</span></span><br><span class="line">         <span class="type">MinioClient</span> <span class="variable">minioClient</span> <span class="operator">=</span> MinioClient.builder().endpoint(<span class="string">&quot;http://192.168.7.250:9000&quot;</span>)</span><br><span class="line">               .credentials(<span class="string">&quot;minioadmin&quot;</span>, <span class="string">&quot;minioadmin&quot;</span>).build();</span><br><span class="line"></span><br><span class="line">         <span class="comment">// Make &#x27;asiatrip&#x27; bucket if not exist.</span></span><br><span class="line">         <span class="type">boolean</span> <span class="variable">found</span> <span class="operator">=</span> minioClient.bucketExists(BucketExistsArgs.builder().bucket(<span class="string">&quot;abc&quot;</span>).build());</span><br><span class="line">         <span class="keyword">if</span> (!found) &#123;</span><br><span class="line">            <span class="comment">// Make a new bucket called &#x27;asiatrip&#x27;.</span></span><br><span class="line">            minioClient.makeBucket(MakeBucketArgs.builder().bucket(<span class="string">&quot;abc&quot;</span>).build());</span><br><span class="line">         &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Bucket &#x27;abc&#x27; already exists.&quot;</span>);</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="comment">// Upload &#x27;/home/user/Photos/asiaphotos.zip&#x27; as object name</span></span><br><span class="line">         <span class="comment">// &#x27;asiaphotos-2015.zip&#x27; to bucket</span></span><br><span class="line">         <span class="comment">// &#x27;asiatrip&#x27;.</span></span><br><span class="line"><span class="comment">//       minioClient.uploadObject(UploadObjectArgs.builder().bucket(&quot;abc&quot;).object(&quot;1.txt&quot;)</span></span><br><span class="line"><span class="comment">//             .filename(&quot;D:\\实时监控数据.txt&quot;).build());</span></span><br><span class="line"><span class="comment">//       System.out.println(&quot;&#x27;实时监控数据.txt&#x27; is successfully uploaded as &quot;</span></span><br><span class="line"><span class="comment">//             + &quot;object &#x27;1.txt&#x27; to bucket &#x27;abc&#x27;.&quot;);</span></span><br><span class="line">         </span><br><span class="line">         </span><br><span class="line">      &#125; <span class="keyword">catch</span> (MinioException e) &#123;</span><br><span class="line">         System.out.println(<span class="string">&quot;Error occurred: &quot;</span> + e);</span><br><span class="line">         System.out.println(<span class="string">&quot;HTTP trace: &quot;</span> + e.httpTrace());</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="6-Controller"><a href="#6-Controller" class="headerlink" title="6.Controller"></a>6.Controller</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.net.URLEncoder;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletOutputStream;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> org.apache.tomcat.util.http.fileupload.IOUtils;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMethod;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestParam;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.multipart.MultipartFile;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> boot.spring.domain.AjaxResult;</span><br><span class="line"><span class="keyword">import</span> boot.spring.util.MinioUtil;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//@Api(tags = &quot;文件操作接口&quot;)</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileController</span> &#123;</span><br><span class="line">   </span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">   MinioUtil minioUtil;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;上传一个文件&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/uploadfile&quot;, method = RequestMethod.POST)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">fileupload</span><span class="params">(<span class="meta">@RequestParam</span> MultipartFile uploadfile, <span class="meta">@RequestParam</span> String bucket, </span></span><br><span class="line"><span class="params">         <span class="meta">@RequestParam(required=false)</span> String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioUtil.createBucket(bucket);</span><br><span class="line">      <span class="keyword">if</span> (objectName != <span class="literal">null</span>) &#123;</span><br><span class="line">         minioUtil.uploadFile(uploadfile.getInputStream(), bucket, objectName+<span class="string">&quot;/&quot;</span>+uploadfile.getOriginalFilename());</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         minioUtil.uploadFile(uploadfile.getInputStream(), bucket, uploadfile.getOriginalFilename());</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success();</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;列出所有的桶&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/listBuckets&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">listBuckets</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success(minioUtil.listBuckets());</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//http://localhost:9000/列出所有的桶</span></span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;递归列出一个桶中的所有文件和目录&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/listFiles&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">listFiles</span><span class="params">(<span class="meta">@RequestParam</span> String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success(<span class="string">&quot;200&quot;</span>, minioUtil.listFiles(bucket));</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//&#123;&quot;msg&quot;:&quot;200&quot;,&quot;code&quot;:0,&quot;data&quot;:[&#123;&quot;filename&quot;:&quot;a/snap.png&quot;,&quot;directory&quot;:false&#125;,&#123;&quot;filename&quot;:&quot;b/a/snap.png&quot;,&quot;directory&quot;:false&#125;,&#123;&quot;filename&quot;:&quot;snap.png&quot;,&quot;directory&quot;:false&#125;]&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;下载一个文件&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/downloadFile&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">downloadFile</span><span class="params">(<span class="meta">@RequestParam</span> String bucket, <span class="meta">@RequestParam</span> String objectName,</span></span><br><span class="line"><span class="params">         HttpServletResponse response)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> minioUtil.download(bucket, objectName);</span><br><span class="line">      <span class="type">ServletOutputStream</span> <span class="variable">output</span> <span class="operator">=</span> response.getOutputStream();</span><br><span class="line">      response.setHeader(<span class="string">&quot;Content-Disposition&quot;</span>, <span class="string">&quot;attachment;filename=&quot;</span> + URLEncoder.encode(objectName.substring(objectName.lastIndexOf(<span class="string">&quot;/&quot;</span>) + <span class="number">1</span>), <span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        response.setContentType(<span class="string">&quot;application/octet-stream&quot;</span>);</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">      IOUtils.copy(stream, output);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//http://localhost:9000/downloadFile?bucket=bucket&amp;objectName=b/a/snap.png</span></span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;删除一个文件&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/deleteFile&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">deleteFile</span><span class="params">(<span class="meta">@RequestParam</span> String bucket, <span class="meta">@RequestParam</span> String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioUtil.deleteObject(bucket, objectName);</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//http://localhost:9000/deleteFile?bucket=bucket&amp;objectName=b/a/snap.png</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;删除一个桶&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/deleteBucket&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">deleteBucket</span><span class="params">(<span class="meta">@RequestParam</span> String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioUtil.deleteBucket(bucket);</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success();</span><br><span class="line">   &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+
+<p>参考：<a href="https://gitee.com/shenzhanwang/Spring-minio">https://gitee.com/shenzhanwang/Spring-minio</a></p>
+]]></content>
+      <categories>
+        <category>使用Java 操作MinIO</category>
+      </categories>
+      <tags>
+        <tag>分布式文件存储</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MyBatis使用</title>
+    <url>/2021/07/11/Java/mybatis/mybatis/</url>
+    <content><![CDATA[<h2 id="MyBatis-JDK-的动态代理技术"><a href="#MyBatis-JDK-的动态代理技术" class="headerlink" title="MyBatis JDK 的动态代理技术"></a>MyBatis JDK 的动态代理技术</h2><ul>
+<li><p>分析动态代理对象如何生成的？ </p>
+<p>通过动态代理开发模式，我们只编写一个接口，不写实现类，我们通过 getMapper() 方法最终获取到 <strong>org.apache.ibatis.binding.MapperProxy</strong> 代理对象，然后执行功能，而这个代理对象正是 MyBatis 使用了 JDK 的动态代理技术，帮助我们生成了代理实现类对象。从而可以进行相关持久化操作。 </p>
+</li>
+<li><p>分析方法是如何执行的？</p>
+<p>动态代理实现类对象在执行方法的时候最终调用了 <strong>mapperMethod.execute()</strong> 方法，这个方法中通过 switch 语句根据操作类型来判断是新增、修改、删除、查询操作，最后一步回到了 MyBatis 最原生的 SqlSession 方式来执行增删改查。</p>
+<p><strong>Debug跟读源码</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlSession.getMapper(StudentMapper.class);</span><br><span class="line">和</span><br><span class="line">mapper.selectAll();</span><br></pre></td></tr></table></figure></li>
+</ul>
+<p><img src="/Untitled/image-20200820174139362.png" alt="image-20200820174139362"></p>
+<h2 id="mybatis使用"><a href="#mybatis使用" class="headerlink" title="mybatis使用"></a>mybatis使用</h2><h2 id="mapper-与xml对应关系"><a href="#mapper-与xml对应关系" class="headerlink" title="mapper 与xml对应关系"></a>mapper 与xml对应关系</h2><p>mapper                              ——————————&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;                mapper.xml  </p>
+<p><img src="/Untitled/image-20220405173621291.png" alt="image-20220405173621291"></p>
+<h2 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h2><h3 id="1-where-标签"><a href="#1-where-标签" class="headerlink" title="1.where 标签"></a>1.where 标签</h3><h3 id="2-if-标签"><a href="#2-if-标签" class="headerlink" title="2. if  标签"></a>2. if  标签</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="operator">&lt;</span><span class="keyword">where</span><span class="operator">&gt;</span>：条件标签。如果有动态条件，则使用该标签代替 <span class="keyword">where</span> 关键字。</span><br><span class="line"></span><br><span class="line"><span class="operator">&lt;</span>if test<span class="operator">=</span>“条件判断”<span class="operator">&gt;</span></span><br><span class="line">	查询条件拼接</span><br><span class="line"><span class="operator">&lt;</span><span class="operator">/</span>if<span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
+
+
+
+<p><img src="/Untitled/image-20220405174735614.png" alt="image-20220405174735614"></p>
+<h3 id="3-foreach标签-in-1-2-3"><a href="#3-foreach标签-in-1-2-3" class="headerlink" title="3.foreach标签 ( in (1,2,3))"></a>3.foreach标签 ( in (1,2,3))</h3><p>例如：</p>
+<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student  <span class="keyword">WHERE</span> id <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<p><img src="/Untitled/image-20220405180436103.png" alt="image-20220405180436103"></p>
+<p>collection：参数容器类型， (list-集合， array-数组)。<br>open：开始的 SQL 语句。<br>close：结束的 SQL 语句。<br>item：参数变量名。<br>separator：分隔符。</p>
+<p><img src="/mybatis/image-20220410233050827.png" alt="image-20220410233050827"></p>
+<h3 id="4-sql片段的抽取"><a href="#4-sql片段的抽取" class="headerlink" title="4.sql片段的抽取"></a>4.sql片段的抽取</h3><p><strong>定义：</strong></p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">&quot;片段名字&quot;</span>&gt;</span> sql片段 <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>引用：</strong></p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">&quot;片段名字&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><img src="/Untitled/image-20220405180924111.png" alt="image-20220405180924111"></p>
+<h2 id="resultMap"><a href="#resultMap" class="headerlink" title="resultMap"></a>resultMap</h2><p>字段和实体对象属性的映射关系</p>
+<h2 id="一对一查询"><a href="#一对一查询" class="headerlink" title="一对一查询"></a>一对一查询</h2><p>卡号 -人</p>
+<p><img src="/mybatis/image-20220405183520673.png" alt="image-20220405183520673"></p>
+<h2 id="一对多查询"><a href="#一对多查询" class="headerlink" title="一对多查询"></a>一对多查询</h2><p>班级学生</p>
+<p><img src="/mybatis/image-20220411001204161.png" alt="image-20220411001204161"></p>
+<h2 id="多对多查询"><a href="#多对多查询" class="headerlink" title="多对多查询"></a>多对多查询</h2><p>学生 课程</p>
+<p>多对多</p>
+<p><img src="/mybatis/image-20220411002638101.png" alt="image-20220411002638101"></p>
+<p>column 属性：<strong>表</strong>中字段名称</p>
+<p>property 属性：被包含<strong>对象</strong>的<strong>变量</strong>名</p>
+]]></content>
+      <categories>
+        <category>MyBatis</category>
+      </categories>
+      <tags>
+        <tag>MyBatis</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>JVM 虚拟机</title>
     <url>/2022/01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/</url>
     <content><![CDATA[<h1 id="JVM内存结构"><a href="#JVM内存结构" class="headerlink" title="JVM内存结构"></a>JVM内存结构</h1><p>java虚拟机在执行程序的过程中会将内存划分为不同的数据区域</p>
@@ -2387,124 +2505,6 @@
       </categories>
       <tags>
         <tag>JVM</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MinIO</title>
-    <url>/2020/11/20/Java/minio%E5%AF%B9%E8%B1%A1%E5%AD%98%E5%82%A8/minio/</url>
-    <content><![CDATA[<h1 id=""><a href="#" class="headerlink" title=""></a></h1><blockquote>
-<p>常见的对象存储服务有阿里云的OSS对象存储、FastDFS分布式文件系统以及公司的私有云平台等等，以便于数据的存储和快速获取。但随着业务的快速发展，我们需要存储一些身份信息用于审核和实名相关的数据，这部分数据较为敏感，因此对于敏感数据的存储我们选择了使用兼容S3协议的开源分布式对象存储-<a href="https://so.csdn.net/so/search?q=Minio&spm=1001.2101.3001.7020">Minio</a>来进行自建服务。</p>
-</blockquote>
-<h2 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h2><blockquote>
-<p>MinIO对象存储系统是为海量数据存储、人工智能、大数据分析而设计，基于Apache License v2.0开源协议的对象存储系统，它完全兼容Amazon S3接口，单个对象最大可达5TB，适合存储海量图片、视频、日志文件、备份数据和容器&#x2F;虚拟机镜像等。MinIO主要采用Golang语言实现，整个系统都运行在操作系统的用户态空间，客户端与存储服务器之间采用http&#x2F;https通信协议。</p>
-</blockquote>
-<p>中文文档方便学习Minio：<a href="http://docs.minio.org.cn/docs/master/minio-docker-quickstart-guide">http://docs.minio.org.cn/docs/master/minio-docker-quickstart-guide</a></p>
-<h2 id="安装步骤"><a href="#安装步骤" class="headerlink" title="安装步骤"></a>安装步骤</h2><h3 id="1-查询minio服务版本"><a href="#1-查询minio服务版本" class="headerlink" title="1.查询minio服务版本"></a>1.查询minio服务版本</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">docker search minio</span><br></pre></td></tr></table></figure>
-
-<p><img src="/minio/97b50b33713246528527163eb9e47421.png" alt="在这里插入图片描述"></p>
-<h3 id="2-拉取minio"><a href="#2-拉取minio" class="headerlink" title="2.拉取minio"></a>2.拉取minio</h3><h3 id="3-docker-hub下载其他版本"><a href="#3-docker-hub下载其他版本" class="headerlink" title="3. docker hub下载其他版本"></a>3. docker hub下载其他版本</h3><p><a href="https://hub.docker.com/r/minio/minio/tags?page=1&ordering=last_updated">https://hub.docker.com/r/minio/minio/tags?page=1&amp;ordering=last_updated</a></p>
-<p><strong>2021年6月17号的</strong>。<br><img src="/minio/1cb2ddcc346a4442a4f26b605d41cfb4.png" alt="在这里插入图片描述"></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">docker pull minio/minio:RELEASE<span class="number">.2021</span>-<span class="number">06</span>-17T00-<span class="number">10</span>-46Z</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="4-启动"><a href="#4-启动" class="headerlink" title="4. 启动"></a>4. 启动</h3><blockquote>
-<p>MinIO 需要一个持久卷来存储配置和应用数据。不过, 如果只是为了测试一下, 您可以通过简单地传递一个目录（在下面的示例中为&#x2F; data）启动MinIO。这个目录会在容器启动时在容器的文件系统中创建，不过所有的数据都会在容器退出时丢失。</p>
-</blockquote>
-<p>首先你的key 和 secret是重要的，就相当于你的账号密码，不要设置的那么简单，还有就是你的文件存放，假设服务宕机了，文件也不丢失，服务迁移了，文件也能跟着迁移，这才是工作中应当注意的地方。</p>
-<p><strong>要覆盖MinIO的自动生成的密钥，您可以将Access和Secret密钥设为环境变量。 MinIO允许常规字符串作为Access和Secret密钥。</strong></p>
-<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">docker run -d -p <span class="number">9000</span>:<span class="number">9000</span> --name minio\</span><br><span class="line">  -e <span class="string">&quot;MINIO_ACCESS_KEY=admin&quot;</span> \</span><br><span class="line">  -e <span class="string">&quot;MINIO_SECRET_KEY=1415479273@qq.com&quot;</span> \</span><br><span class="line">  -v /mydata/minio/data:/data \</span><br><span class="line">  -v /mydata/minio/config:/root/.minio \</span><br><span class="line">  minio/minio:RELEASE<span class="number">.2021</span>-<span class="number">06</span>-17T00-<span class="number">10</span>-46Z server /data</span><br></pre></td></tr></table></figure>
-
-
-
-<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">/mydata/minio/data // 数据卷存放路径（自行添加）</span><br><span class="line">/mydata/minio/config //服务配置文件（自行添加）</span><br></pre></td></tr></table></figure>
-
-
-
-
-<p>上传文件成功之后，我们去到我们的服务data数据卷存储位置，查看文件是否存在。</p>
-<h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><h3 id="1-导入依赖"><a href="#1-导入依赖" class="headerlink" title="1.导入依赖"></a>1.导入依赖</h3><figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>io.minio<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>minio<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">   <span class="tag">&lt;<span class="name">version</span>&gt;</span>8.2.0<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="2-yml配置文件"><a href="#2-yml配置文件" class="headerlink" title="2.yml配置文件"></a>2.yml配置文件</h3><figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">server:</span></span><br><span class="line">  <span class="attr">port:</span> <span class="number">9000</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="attr">spring:</span></span><br><span class="line">  <span class="attr">servlet:</span></span><br><span class="line">    <span class="attr">multipart:</span></span><br><span class="line">      <span class="attr">max-file-size:</span> <span class="string">100MB</span></span><br><span class="line">      <span class="attr">max-request-size:</span> <span class="string">1000MB</span></span><br><span class="line">      </span><br><span class="line"><span class="comment">#minio配置</span></span><br><span class="line"><span class="attr">minio:</span></span><br><span class="line">  <span class="attr">url:</span> <span class="string">http://8.144.162.164:9000</span>  <span class="comment">#对象存储服务的URL</span></span><br><span class="line">  <span class="attr">accessKey:</span> <span class="string">admin</span> <span class="comment">#Access key账户</span></span><br><span class="line">  <span class="attr">secretKey:</span> <span class="string">xxx</span>  <span class="comment">#Secret key密码</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="3-注入MinioClient"><a href="#3-注入MinioClient" class="headerlink" title="3.注入MinioClient"></a>3.注入MinioClient</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.config;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Value;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Bean;</span><br><span class="line"><span class="keyword">import</span> org.springframework.context.annotation.Configuration;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> io.minio.MinioClient;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MinioConfig</span> &#123;</span><br><span class="line">   </span><br><span class="line">   <span class="meta">@Value(&quot;$&#123;minio.url&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String url;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;minio.accessKey&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String accessKey;</span><br><span class="line">    <span class="meta">@Value(&quot;$&#123;minio.secretKey&#125;&quot;)</span></span><br><span class="line">    <span class="keyword">private</span> String secretKey;</span><br><span class="line">    </span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="keyword">public</span> MinioClient <span class="title function_">getMinioClient</span><span class="params">()</span> &#123;</span><br><span class="line">        <span class="type">MinioClient</span> <span class="variable">minioClient</span> <span class="operator">=</span> MinioClient.builder().endpoint(url)</span><br><span class="line">            .credentials(accessKey, secretKey).build();</span><br><span class="line">        <span class="keyword">return</span> minioClient;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<h3 id="4-组件-MinioUtil"><a href="#4-组件-MinioUtil" class="headerlink" title="4.组件-MinioUtil"></a>4.组件-MinioUtil</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.util;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.ArrayList;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Component;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> boot.spring.domain.Fileinfo;</span><br><span class="line"><span class="keyword">import</span> io.minio.BucketExistsArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.GetObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.ListObjectsArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MakeBucketArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MinioClient;</span><br><span class="line"><span class="keyword">import</span> io.minio.PutObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.RemoveBucketArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.RemoveObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.Result;</span><br><span class="line"><span class="keyword">import</span> io.minio.messages.Bucket;</span><br><span class="line"><span class="keyword">import</span> io.minio.messages.Item;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MinioUtil</span> &#123;</span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> MinioClient minioClient;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 创建一个桶</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">createBucket</span><span class="params">(String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="type">boolean</span> <span class="variable">found</span> <span class="operator">=</span> minioClient.bucketExists(BucketExistsArgs.builder().bucket(bucket).build());</span><br><span class="line">      <span class="keyword">if</span> (!found) &#123;</span><br><span class="line">         minioClient.makeBucket(MakeBucketArgs.builder().bucket(bucket).build());</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 删除一个桶</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">deleteBucket</span><span class="params">(String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioClient.removeBucket(RemoveBucketArgs.builder().bucket(bucket).build());</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">    <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 列出所有的桶</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> List&lt;String&gt; <span class="title function_">listBuckets</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      List&lt;Bucket&gt; list = minioClient.listBuckets();</span><br><span class="line">      List&lt;String&gt; names = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">      list.forEach(b -&gt; &#123;</span><br><span class="line">         names.add(b.name());</span><br><span class="line">      &#125;);</span><br><span class="line">      <span class="keyword">return</span> names;</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">  </span><br><span class="line">  </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 列出一个桶中的所有文件和目录</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> List&lt;Fileinfo&gt; <span class="title function_">listFiles</span><span class="params">(String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      Iterable&lt;Result&lt;Item&gt;&gt; results = minioClient.listObjects(</span><br><span class="line">             ListObjectsArgs.builder().bucket(bucket).recursive(<span class="literal">true</span>).build());</span><br><span class="line">         </span><br><span class="line">         List&lt;Fileinfo&gt; infos = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;&gt;();</span><br><span class="line">            results.forEach(r-&gt;&#123;</span><br><span class="line">               <span class="type">Fileinfo</span> <span class="variable">info</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Fileinfo</span>();</span><br><span class="line">               <span class="keyword">try</span> &#123;</span><br><span class="line">                  <span class="type">Item</span> <span class="variable">item</span> <span class="operator">=</span> r.get();</span><br><span class="line">                  info.setFilename(item.objectName());</span><br><span class="line">                  info.setDirectory(item.isDir());</span><br><span class="line">                  infos.add(info);</span><br><span class="line">               &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">                  e.printStackTrace();</span><br><span class="line">               &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">      <span class="keyword">return</span> infos;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">     <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 上传一个文件</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">uploadFile</span><span class="params">(InputStream stream, String bucket, String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioClient.putObject(PutObjectArgs.builder().bucket(bucket).object(objectName)</span><br><span class="line">            .stream(stream, -<span class="number">1</span>, <span class="number">10485760</span>).build());</span><br><span class="line">   &#125;</span><br><span class="line">    </span><br><span class="line">    </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 下载一个文件</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> InputStream <span class="title function_">download</span><span class="params">(String bucket, String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> minioClient.getObject(</span><br><span class="line">                    GetObjectArgs.builder().bucket(bucket).object(objectName).build());</span><br><span class="line">      <span class="keyword">return</span> stream;</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   <span class="comment">/**</span></span><br><span class="line"><span class="comment">    * 删除一个文件</span></span><br><span class="line"><span class="comment">    */</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">deleteObject</span><span class="params">(String bucket, String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioClient.removeObject(RemoveObjectArgs.builder().bucket(bucket).object(objectName).build());</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<h3 id="5-测试"><a href="#5-测试" class="headerlink" title="5.测试"></a>5.测试</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.service.impl;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.security.InvalidKeyException;</span><br><span class="line"><span class="keyword">import</span> java.security.NoSuchAlgorithmException;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Service;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> boot.spring.service.MinIOService;</span><br><span class="line"><span class="keyword">import</span> io.minio.BucketExistsArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MakeBucketArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.MinioClient;</span><br><span class="line"><span class="keyword">import</span> io.minio.PutObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.UploadObjectArgs;</span><br><span class="line"><span class="keyword">import</span> io.minio.errors.MinioException;</span><br><span class="line"></span><br><span class="line"><span class="meta">@Service(&quot;minIOService&quot;)</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">MinIOServiceImpl</span> <span class="keyword">implements</span> <span class="title class_">MinIOService</span> &#123;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> IOException, NoSuchAlgorithmException, InvalidKeyException &#123;</span><br><span class="line">      <span class="keyword">try</span> &#123;</span><br><span class="line">         <span class="comment">// Create a minioClient with the MinIO server playground, its access</span></span><br><span class="line">         <span class="comment">// key and secret key.</span></span><br><span class="line">         <span class="type">MinioClient</span> <span class="variable">minioClient</span> <span class="operator">=</span> MinioClient.builder().endpoint(<span class="string">&quot;http://192.168.7.250:9000&quot;</span>)</span><br><span class="line">               .credentials(<span class="string">&quot;minioadmin&quot;</span>, <span class="string">&quot;minioadmin&quot;</span>).build();</span><br><span class="line"></span><br><span class="line">         <span class="comment">// Make &#x27;asiatrip&#x27; bucket if not exist.</span></span><br><span class="line">         <span class="type">boolean</span> <span class="variable">found</span> <span class="operator">=</span> minioClient.bucketExists(BucketExistsArgs.builder().bucket(<span class="string">&quot;abc&quot;</span>).build());</span><br><span class="line">         <span class="keyword">if</span> (!found) &#123;</span><br><span class="line">            <span class="comment">// Make a new bucket called &#x27;asiatrip&#x27;.</span></span><br><span class="line">            minioClient.makeBucket(MakeBucketArgs.builder().bucket(<span class="string">&quot;abc&quot;</span>).build());</span><br><span class="line">         &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">&quot;Bucket &#x27;abc&#x27; already exists.&quot;</span>);</span><br><span class="line">         &#125;</span><br><span class="line"></span><br><span class="line">         <span class="comment">// Upload &#x27;/home/user/Photos/asiaphotos.zip&#x27; as object name</span></span><br><span class="line">         <span class="comment">// &#x27;asiaphotos-2015.zip&#x27; to bucket</span></span><br><span class="line">         <span class="comment">// &#x27;asiatrip&#x27;.</span></span><br><span class="line"><span class="comment">//       minioClient.uploadObject(UploadObjectArgs.builder().bucket(&quot;abc&quot;).object(&quot;1.txt&quot;)</span></span><br><span class="line"><span class="comment">//             .filename(&quot;D:\\实时监控数据.txt&quot;).build());</span></span><br><span class="line"><span class="comment">//       System.out.println(&quot;&#x27;实时监控数据.txt&#x27; is successfully uploaded as &quot;</span></span><br><span class="line"><span class="comment">//             + &quot;object &#x27;1.txt&#x27; to bucket &#x27;abc&#x27;.&quot;);</span></span><br><span class="line">         </span><br><span class="line">         </span><br><span class="line">      &#125; <span class="keyword">catch</span> (MinioException e) &#123;</span><br><span class="line">         System.out.println(<span class="string">&quot;Error occurred: &quot;</span> + e);</span><br><span class="line">         System.out.println(<span class="string">&quot;HTTP trace: &quot;</span> + e.httpTrace());</span><br><span class="line">      &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<h3 id="6-Controller"><a href="#6-Controller" class="headerlink" title="6.Controller"></a>6.Controller</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">package</span> boot.spring.controller;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.net.URLEncoder;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.ServletOutputStream;</span><br><span class="line"><span class="keyword">import</span> javax.servlet.http.HttpServletResponse;</span><br><span class="line"><span class="keyword">import</span> org.apache.tomcat.util.http.fileupload.IOUtils;</span><br><span class="line"><span class="keyword">import</span> org.springframework.beans.factory.annotation.Autowired;</span><br><span class="line"><span class="keyword">import</span> org.springframework.stereotype.Controller;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMethod;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestParam;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.ResponseBody;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.multipart.MultipartFile;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> boot.spring.domain.AjaxResult;</span><br><span class="line"><span class="keyword">import</span> boot.spring.util.MinioUtil;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="comment">//@Api(tags = &quot;文件操作接口&quot;)</span></span><br><span class="line"><span class="meta">@Controller</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">FileController</span> &#123;</span><br><span class="line">   </span><br><span class="line">   <span class="meta">@Autowired</span></span><br><span class="line">   MinioUtil minioUtil;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;上传一个文件&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/uploadfile&quot;, method = RequestMethod.POST)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">fileupload</span><span class="params">(<span class="meta">@RequestParam</span> MultipartFile uploadfile, <span class="meta">@RequestParam</span> String bucket, </span></span><br><span class="line"><span class="params">         <span class="meta">@RequestParam(required=false)</span> String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioUtil.createBucket(bucket);</span><br><span class="line">      <span class="keyword">if</span> (objectName != <span class="literal">null</span>) &#123;</span><br><span class="line">         minioUtil.uploadFile(uploadfile.getInputStream(), bucket, objectName+<span class="string">&quot;/&quot;</span>+uploadfile.getOriginalFilename());</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">         minioUtil.uploadFile(uploadfile.getInputStream(), bucket, uploadfile.getOriginalFilename());</span><br><span class="line">      &#125;</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success();</span><br><span class="line">   &#125;</span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;列出所有的桶&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/listBuckets&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">listBuckets</span><span class="params">()</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success(minioUtil.listBuckets());</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//http://localhost:9000/列出所有的桶</span></span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;递归列出一个桶中的所有文件和目录&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/listFiles&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">listFiles</span><span class="params">(<span class="meta">@RequestParam</span> String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success(<span class="string">&quot;200&quot;</span>, minioUtil.listFiles(bucket));</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//&#123;&quot;msg&quot;:&quot;200&quot;,&quot;code&quot;:0,&quot;data&quot;:[&#123;&quot;filename&quot;:&quot;a/snap.png&quot;,&quot;directory&quot;:false&#125;,&#123;&quot;filename&quot;:&quot;b/a/snap.png&quot;,&quot;directory&quot;:false&#125;,&#123;&quot;filename&quot;:&quot;snap.png&quot;,&quot;directory&quot;:false&#125;]&#125;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;下载一个文件&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/downloadFile&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">downloadFile</span><span class="params">(<span class="meta">@RequestParam</span> String bucket, <span class="meta">@RequestParam</span> String objectName,</span></span><br><span class="line"><span class="params">         HttpServletResponse response)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      <span class="type">InputStream</span> <span class="variable">stream</span> <span class="operator">=</span> minioUtil.download(bucket, objectName);</span><br><span class="line">      <span class="type">ServletOutputStream</span> <span class="variable">output</span> <span class="operator">=</span> response.getOutputStream();</span><br><span class="line">      response.setHeader(<span class="string">&quot;Content-Disposition&quot;</span>, <span class="string">&quot;attachment;filename=&quot;</span> + URLEncoder.encode(objectName.substring(objectName.lastIndexOf(<span class="string">&quot;/&quot;</span>) + <span class="number">1</span>), <span class="string">&quot;UTF-8&quot;</span>));</span><br><span class="line">        response.setContentType(<span class="string">&quot;application/octet-stream&quot;</span>);</span><br><span class="line">        response.setCharacterEncoding(<span class="string">&quot;UTF-8&quot;</span>);</span><br><span class="line">      IOUtils.copy(stream, output);</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//http://localhost:9000/downloadFile?bucket=bucket&amp;objectName=b/a/snap.png</span></span><br><span class="line">   </span><br><span class="line">   </span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;删除一个文件&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/deleteFile&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">deleteFile</span><span class="params">(<span class="meta">@RequestParam</span> String bucket, <span class="meta">@RequestParam</span> String objectName)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioUtil.deleteObject(bucket, objectName);</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success();</span><br><span class="line">   &#125;</span><br><span class="line">   <span class="comment">//http://localhost:9000/deleteFile?bucket=bucket&amp;objectName=b/a/snap.png</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   <span class="comment">//@ApiOperation(&quot;删除一个桶&quot;)</span></span><br><span class="line">   <span class="meta">@RequestMapping(value = &quot;/deleteBucket&quot;, method = RequestMethod.GET)</span></span><br><span class="line">   <span class="meta">@ResponseBody</span></span><br><span class="line">   <span class="keyword">public</span> AjaxResult <span class="title function_">deleteBucket</span><span class="params">(<span class="meta">@RequestParam</span> String bucket)</span> <span class="keyword">throws</span> Exception &#123;</span><br><span class="line">      minioUtil.deleteBucket(bucket);</span><br><span class="line">      <span class="keyword">return</span> AjaxResult.success();</span><br><span class="line">   &#125;  </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-<p>参考：<a href="https://gitee.com/shenzhanwang/Spring-minio">https://gitee.com/shenzhanwang/Spring-minio</a></p>
-]]></content>
-      <categories>
-        <category>使用Java 操作MinIO</category>
-      </categories>
-      <tags>
-        <tag>分布式文件存储</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>MyBatis使用</title>
-    <url>/2021/07/11/Java/mybatis/mybatis/</url>
-    <content><![CDATA[<h2 id="MyBatis-JDK-的动态代理技术"><a href="#MyBatis-JDK-的动态代理技术" class="headerlink" title="MyBatis JDK 的动态代理技术"></a>MyBatis JDK 的动态代理技术</h2><ul>
-<li><p>分析动态代理对象如何生成的？ </p>
-<p>通过动态代理开发模式，我们只编写一个接口，不写实现类，我们通过 getMapper() 方法最终获取到 <strong>org.apache.ibatis.binding.MapperProxy</strong> 代理对象，然后执行功能，而这个代理对象正是 MyBatis 使用了 JDK 的动态代理技术，帮助我们生成了代理实现类对象。从而可以进行相关持久化操作。 </p>
-</li>
-<li><p>分析方法是如何执行的？</p>
-<p>动态代理实现类对象在执行方法的时候最终调用了 <strong>mapperMethod.execute()</strong> 方法，这个方法中通过 switch 语句根据操作类型来判断是新增、修改、删除、查询操作，最后一步回到了 MyBatis 最原生的 SqlSession 方式来执行增删改查。</p>
-<p><strong>Debug跟读源码</strong></p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sqlSession.getMapper(StudentMapper.class);</span><br><span class="line">和</span><br><span class="line">mapper.selectAll();</span><br></pre></td></tr></table></figure></li>
-</ul>
-<p><img src="/Untitled/image-20200820174139362.png" alt="image-20200820174139362"></p>
-<h2 id="mybatis使用"><a href="#mybatis使用" class="headerlink" title="mybatis使用"></a>mybatis使用</h2><h2 id="mapper-与xml对应关系"><a href="#mapper-与xml对应关系" class="headerlink" title="mapper 与xml对应关系"></a>mapper 与xml对应关系</h2><p>mapper                              ——————————&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;                mapper.xml  </p>
-<p><img src="/Untitled/image-20220405173621291.png" alt="image-20220405173621291"></p>
-<h2 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h2><h3 id="1-where-标签"><a href="#1-where-标签" class="headerlink" title="1.where 标签"></a>1.where 标签</h3><h3 id="2-if-标签"><a href="#2-if-标签" class="headerlink" title="2. if  标签"></a>2. if  标签</h3><figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="operator">&lt;</span><span class="keyword">where</span><span class="operator">&gt;</span>：条件标签。如果有动态条件，则使用该标签代替 <span class="keyword">where</span> 关键字。</span><br><span class="line"></span><br><span class="line"><span class="operator">&lt;</span>if test<span class="operator">=</span>“条件判断”<span class="operator">&gt;</span></span><br><span class="line">	查询条件拼接</span><br><span class="line"><span class="operator">&lt;</span><span class="operator">/</span>if<span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
-
-
-
-<p><img src="/Untitled/image-20220405174735614.png" alt="image-20220405174735614"></p>
-<h3 id="3-foreach标签-in-1-2-3"><a href="#3-foreach标签-in-1-2-3" class="headerlink" title="3.foreach标签 ( in (1,2,3))"></a>3.foreach标签 ( in (1,2,3))</h3><p>例如：</p>
-<figure class="highlight sql"><table><tr><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student  <span class="keyword">WHERE</span> id <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-<p><img src="/Untitled/image-20220405180436103.png" alt="image-20220405180436103"></p>
-<p>collection：参数容器类型， (list-集合， array-数组)。<br>open：开始的 SQL 语句。<br>close：结束的 SQL 语句。<br>item：参数变量名。<br>separator：分隔符。</p>
-<p><img src="/mybatis/image-20220410233050827.png" alt="image-20220410233050827"></p>
-<h3 id="4-sql片段的抽取"><a href="#4-sql片段的抽取" class="headerlink" title="4.sql片段的抽取"></a>4.sql片段的抽取</h3><p><strong>定义：</strong></p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">&quot;片段名字&quot;</span>&gt;</span> sql片段 <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><strong>引用：</strong></p>
-<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">&quot;片段名字&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p><img src="/Untitled/image-20220405180924111.png" alt="image-20220405180924111"></p>
-<h2 id="resultMap"><a href="#resultMap" class="headerlink" title="resultMap"></a>resultMap</h2><p>字段和实体对象属性的映射关系</p>
-<h2 id="一对一查询"><a href="#一对一查询" class="headerlink" title="一对一查询"></a>一对一查询</h2><p>卡号 -人</p>
-<p><img src="/mybatis/image-20220405183520673.png" alt="image-20220405183520673"></p>
-<h2 id="一对多查询"><a href="#一对多查询" class="headerlink" title="一对多查询"></a>一对多查询</h2><p>班级学生</p>
-<p><img src="/mybatis/image-20220411001204161.png" alt="image-20220411001204161"></p>
-<h2 id="多对多查询"><a href="#多对多查询" class="headerlink" title="多对多查询"></a>多对多查询</h2><p>学生 课程</p>
-<p>多对多</p>
-<p><img src="/mybatis/image-20220411002638101.png" alt="image-20220411002638101"></p>
-<p>column 属性：<strong>表</strong>中字段名称</p>
-<p>property 属性：被包含<strong>对象</strong>的<strong>变量</strong>名</p>
-]]></content>
-      <categories>
-        <category>MyBatis</category>
-      </categories>
-      <tags>
-        <tag>MyBatis</tag>
       </tags>
   </entry>
   <entry>
@@ -3444,18 +3444,6 @@ flush privileges;
       </tags>
   </entry>
   <entry>
-    <title>Edge浏览器扩展</title>
-    <url>/2022/03/19/Java/%E6%B5%8F%E8%A7%88%E5%99%A8/%E6%89%A9%E5%B1%95/</url>
-    <content><![CDATA[<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="Edge浏览器扩展"><a href="#Edge浏览器扩展" class="headerlink" title="Edge浏览器扩展"></a>Edge浏览器扩展</h2><p><img src="/%E6%89%A9%E5%B1%95/image-20220302031950262.png" alt="image-20220302031950262"></p>
-]]></content>
-      <categories>
-        <category>浏览器扩展</category>
-      </categories>
-      <tags>
-        <tag>浏览器扩展</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>油猴脚本</title>
     <url>/2022/03/19/Java/%E6%B5%8F%E8%A7%88%E5%99%A8/%E6%B2%B9%E7%8C%B4%E8%84%9A%E6%9C%AC/</url>
     <content><![CDATA[<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h1 id="油猴脚本"><a href="#油猴脚本" class="headerlink" title="油猴脚本"></a>油猴脚本</h1><p><img src="/%E6%B2%B9%E7%8C%B4%E8%84%9A%E6%9C%AC/image-20220302031852407.png" alt="image-20220302031852407"></p>
@@ -3468,52 +3456,15 @@ flush privileges;
       </tags>
   </entry>
   <entry>
-    <title>为什么使用消息队列</title>
-    <url>/2021/06/01/Java/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</url>
-    <content><![CDATA[<h2 id="1-2-AMQP-和-JMS"><a href="#1-2-AMQP-和-JMS" class="headerlink" title="1.2. AMQP 和 JMS"></a>1.2. AMQP 和 JMS</h2><p>MQ是消息通信的模型；实现MQ的大致有两种主流方式：AMQP、JMS。</p>
-<h3 id="1-2-1-AMQP"><a href="#1-2-1-AMQP" class="headerlink" title="1.2.1. AMQP"></a>1.2.1. AMQP</h3><p>AMQP是一种协议，更准确的说是一种binary wire-level protocol（链接协议）。这是其和JMS的本质差别，</p>
-<p>AMQP不从API层进行限定，而是直接定义网络交换的数据格式。</p>
-<h3 id="1-2-2-JMS"><a href="#1-2-2-JMS" class="headerlink" title="1.2.2. JMS"></a>1.2.2. JMS</h3><p>JMS即Java消息服务（JavaMessage Service）应用程序接口，</p>
-<p>是一个Java平台中关于面向消息中间件（MOM）的API，用于在两个应用程序之间，或分布式系统中发送消息，进行异步通信。</p>
-<h3 id="1-2-3-AMQP-与-JMS-区别"><a href="#1-2-3-AMQP-与-JMS-区别" class="headerlink" title="1.2.3. AMQP 与 JMS 区别"></a>1.2.3. AMQP 与 JMS 区别</h3><ul>
-<li>JMS是<strong>定义</strong>了统一的<strong>接口</strong>，来对消息操作进行统一；AMQP是通过<strong>规定协议</strong>来统一数据交互的格式</li>
-<li>JMS限定了必须使用<strong>Java语言</strong>；AMQP只是协议，不规定实现方式，因此是<strong>跨语言的</strong>。</li>
-<li>JMS规定了<strong>两种消息模式</strong>；而AMQP的<strong>消息模式更加丰富</strong></li>
-</ul>
-<h4 id="JMS-两种消息模型"><a href="#JMS-两种消息模型" class="headerlink" title="JMS 两种消息模型"></a>JMS 两种消息模型</h4><p><strong>① 点到点（P2P）模型</strong></p>
-<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E9%98%9F%E5%88%97%E6%A8%A1%E5%9E%8B23.png" alt="队列模型"></p>
-<p>使用**队列（Queue）**作为消息通信载体；满足**生产者与消费者模式**，一条消息只能被一个消费者使用，未被消费的消息在队列中保留直到被消费或超时。比如：我们生产者发送 100 条消息的话，两个消费者来消费一般情况下两个消费者会按照消息发送的顺序各自消费一半（也就是你一个我一个的消费。）</p>
-<p><strong>② 发布&#x2F;订阅（Pub&#x2F;Sub）模型</strong></p>
-<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%9E%8B.png" alt="发布订阅模型"></p>
-<p>发布订阅模型（Pub&#x2F;Sub） 使用<strong>主题（Topic）**作为消息通信载体，类似于**广播模式**；发布者发布一条消息，该消息通过主题传递给所有的订阅者，</strong>在一条消息广播之后才订阅的用户则是收不到该条消息的**。</p>
-<h1 id="为什么使用消息队列"><a href="#为什么使用消息队列" class="headerlink" title="为什么使用消息队列"></a>为什么使用消息队列</h1><p>先来说一下为什么要使用消息队列，六个字总结：解耦、异步、消峰。</p>
-<p>1）<strong>「解耦」</strong></p>
-<p>传统模式下系统间的耦合性太强。怎么说呢，举个例子：系统 A 通过接口调用发送数据到 B、C、D 三个系统，如果将来 E 系统接入或者 B 系统不需要接入了，那么系统 A 还需要修改代码，非常麻烦。</p>
-<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165123724.png" alt="image-20220226165123724" style="zoom:67%;" />
-
-<p>如果系统 A 产生了一条比较关键的数据，那么它就要时时刻刻考虑 B、C、D、E 四个系统如果挂了该咋办？这条数据它们是否都收到了？显然，系统 A 跟其它系统严重耦合。</p>
-<p>而如果我们将数据（消息）写入消息队列，需要消息的系统直接自己从消息队列中消费。这样下来，系统 A 就不需要去考虑要给谁发送数据，不需要去维护这个代码，也不需要考虑其他系统是否调用成功、失败超时等情况，反正我只负责生产，别的我不管。</p>
-<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165106304.png" alt="image-20220226165106304" style="zoom:50%;" />
-
-<p>2）<strong>「异步」</strong></p>
-<p>先来看传统同步的情况，举个例子：系统 A 接收一个用户请求，需要进行写库操作，还需要同样的在 B、C、D 三个系统中进行写库操作。如果 A 自己本地写库只要 1ms，而 B、C、D 三个系统写库分别要 100ms、200ms、300ms。最终请求总延时是 1 + 100 + 200 + 300 &#x3D; 601ms，用户体验大打折扣。</p>
-<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165136977.png" alt="image-20220226165136977" style="zoom:50%;" />
-
-<p>如果使用消息队列，那么系统 A 就只需要发送 3 条消息到消息队列中就行了，假如耗时 5ms，A 系统从接受一个请求到返回响应给用户，总时长是 1 + 5 &#x3D; 6ms，对于用户而言，体验好感度直接拉满。</p>
-<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165247399.png" alt="image-20220226165247399" style="zoom:50%;" />
-
-<p>3）<strong>「消峰」</strong></p>
-<p>如果没有使用缓存或者消息队列，那么系统就是直接基于数据库 MySQL 的，如果有那么一个高峰期，产生了大量的请求涌入 MySQL，毫无疑问，系统将会直接崩溃。</p>
-<p>那如果我们使用消息队列，假设 MySQL 每秒钟最多处理 1k 条数据，而高峰期瞬间涌入了 5k 条数据，不过，这 5k 条数据涌入了消息队列。这样，我们的系统就可以从消息队列中根据数据库的能力慢慢的来拉取请求，不要超过自己每秒能处理的最大请求数量就行。</p>
-<p>也就是说消息队列每秒钟 5k 个请求进来，1k 个请求出去，假设高峰期 1 个小时，那么这段时间就可能有几十万甚至几百万的请求积压在消息队列中。不过这个短暂的高峰期积压是完全可以的，因为高峰期过了之后，每秒钟就没有那么多的请求进入消息队列了，但是数据库依然会按照每秒 1k 个请求的速度处理。所以只要高峰期一过，系统就会快速的将积压的消息给处理掉。</p>
-<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165323165.png" alt="image-20220226165323165" style="zoom: 50%;" />
-
-<h1 id=""><a href="#" class="headerlink" title=""></a></h1>]]></content>
+    <title>Edge浏览器扩展</title>
+    <url>/2022/03/19/Java/%E6%B5%8F%E8%A7%88%E5%99%A8/%E6%89%A9%E5%B1%95/</url>
+    <content><![CDATA[<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h2 id="Edge浏览器扩展"><a href="#Edge浏览器扩展" class="headerlink" title="Edge浏览器扩展"></a>Edge浏览器扩展</h2><p><img src="/%E6%89%A9%E5%B1%95/image-20220302031950262.png" alt="image-20220302031950262"></p>
+]]></content>
       <categories>
-        <category>消息队列</category>
+        <category>浏览器扩展</category>
       </categories>
       <tags>
-        <tag>消息队列</tag>
+        <tag>浏览器扩展</tag>
       </tags>
   </entry>
   <entry>
@@ -3627,6 +3578,55 @@ flush privileges;
 
 
 <h3 id=""><a href="#" class="headerlink" title=""></a></h3>]]></content>
+      <categories>
+        <category>消息队列</category>
+      </categories>
+      <tags>
+        <tag>消息队列</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>为什么使用消息队列</title>
+    <url>/2021/06/01/Java/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/</url>
+    <content><![CDATA[<h2 id="1-2-AMQP-和-JMS"><a href="#1-2-AMQP-和-JMS" class="headerlink" title="1.2. AMQP 和 JMS"></a>1.2. AMQP 和 JMS</h2><p>MQ是消息通信的模型；实现MQ的大致有两种主流方式：AMQP、JMS。</p>
+<h3 id="1-2-1-AMQP"><a href="#1-2-1-AMQP" class="headerlink" title="1.2.1. AMQP"></a>1.2.1. AMQP</h3><p>AMQP是一种协议，更准确的说是一种binary wire-level protocol（链接协议）。这是其和JMS的本质差别，</p>
+<p>AMQP不从API层进行限定，而是直接定义网络交换的数据格式。</p>
+<h3 id="1-2-2-JMS"><a href="#1-2-2-JMS" class="headerlink" title="1.2.2. JMS"></a>1.2.2. JMS</h3><p>JMS即Java消息服务（JavaMessage Service）应用程序接口，</p>
+<p>是一个Java平台中关于面向消息中间件（MOM）的API，用于在两个应用程序之间，或分布式系统中发送消息，进行异步通信。</p>
+<h3 id="1-2-3-AMQP-与-JMS-区别"><a href="#1-2-3-AMQP-与-JMS-区别" class="headerlink" title="1.2.3. AMQP 与 JMS 区别"></a>1.2.3. AMQP 与 JMS 区别</h3><ul>
+<li>JMS是<strong>定义</strong>了统一的<strong>接口</strong>，来对消息操作进行统一；AMQP是通过<strong>规定协议</strong>来统一数据交互的格式</li>
+<li>JMS限定了必须使用<strong>Java语言</strong>；AMQP只是协议，不规定实现方式，因此是<strong>跨语言的</strong>。</li>
+<li>JMS规定了<strong>两种消息模式</strong>；而AMQP的<strong>消息模式更加丰富</strong></li>
+</ul>
+<h4 id="JMS-两种消息模型"><a href="#JMS-两种消息模型" class="headerlink" title="JMS 两种消息模型"></a>JMS 两种消息模型</h4><p><strong>① 点到点（P2P）模型</strong></p>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E9%98%9F%E5%88%97%E6%A8%A1%E5%9E%8B23.png" alt="队列模型"></p>
+<p>使用**队列（Queue）**作为消息通信载体；满足**生产者与消费者模式**，一条消息只能被一个消费者使用，未被消费的消息在队列中保留直到被消费或超时。比如：我们生产者发送 100 条消息的话，两个消费者来消费一般情况下两个消费者会按照消息发送的顺序各自消费一半（也就是你一个我一个的消费。）</p>
+<p><strong>② 发布&#x2F;订阅（Pub&#x2F;Sub）模型</strong></p>
+<p><img src="/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/%E5%8F%91%E5%B8%83%E8%AE%A2%E9%98%85%E6%A8%A1%E5%9E%8B.png" alt="发布订阅模型"></p>
+<p>发布订阅模型（Pub&#x2F;Sub） 使用<strong>主题（Topic）**作为消息通信载体，类似于**广播模式**；发布者发布一条消息，该消息通过主题传递给所有的订阅者，</strong>在一条消息广播之后才订阅的用户则是收不到该条消息的**。</p>
+<h1 id="为什么使用消息队列"><a href="#为什么使用消息队列" class="headerlink" title="为什么使用消息队列"></a>为什么使用消息队列</h1><p>先来说一下为什么要使用消息队列，六个字总结：解耦、异步、消峰。</p>
+<p>1）<strong>「解耦」</strong></p>
+<p>传统模式下系统间的耦合性太强。怎么说呢，举个例子：系统 A 通过接口调用发送数据到 B、C、D 三个系统，如果将来 E 系统接入或者 B 系统不需要接入了，那么系统 A 还需要修改代码，非常麻烦。</p>
+<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165123724.png" alt="image-20220226165123724" style="zoom:67%;" />
+
+<p>如果系统 A 产生了一条比较关键的数据，那么它就要时时刻刻考虑 B、C、D、E 四个系统如果挂了该咋办？这条数据它们是否都收到了？显然，系统 A 跟其它系统严重耦合。</p>
+<p>而如果我们将数据（消息）写入消息队列，需要消息的系统直接自己从消息队列中消费。这样下来，系统 A 就不需要去考虑要给谁发送数据，不需要去维护这个代码，也不需要考虑其他系统是否调用成功、失败超时等情况，反正我只负责生产，别的我不管。</p>
+<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165106304.png" alt="image-20220226165106304" style="zoom:50%;" />
+
+<p>2）<strong>「异步」</strong></p>
+<p>先来看传统同步的情况，举个例子：系统 A 接收一个用户请求，需要进行写库操作，还需要同样的在 B、C、D 三个系统中进行写库操作。如果 A 自己本地写库只要 1ms，而 B、C、D 三个系统写库分别要 100ms、200ms、300ms。最终请求总延时是 1 + 100 + 200 + 300 &#x3D; 601ms，用户体验大打折扣。</p>
+<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165136977.png" alt="image-20220226165136977" style="zoom:50%;" />
+
+<p>如果使用消息队列，那么系统 A 就只需要发送 3 条消息到消息队列中就行了，假如耗时 5ms，A 系统从接受一个请求到返回响应给用户，总时长是 1 + 5 &#x3D; 6ms，对于用户而言，体验好感度直接拉满。</p>
+<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165247399.png" alt="image-20220226165247399" style="zoom:50%;" />
+
+<p>3）<strong>「消峰」</strong></p>
+<p>如果没有使用缓存或者消息队列，那么系统就是直接基于数据库 MySQL 的，如果有那么一个高峰期，产生了大量的请求涌入 MySQL，毫无疑问，系统将会直接崩溃。</p>
+<p>那如果我们使用消息队列，假设 MySQL 每秒钟最多处理 1k 条数据，而高峰期瞬间涌入了 5k 条数据，不过，这 5k 条数据涌入了消息队列。这样，我们的系统就可以从消息队列中根据数据库的能力慢慢的来拉取请求，不要超过自己每秒能处理的最大请求数量就行。</p>
+<p>也就是说消息队列每秒钟 5k 个请求进来，1k 个请求出去，假设高峰期 1 个小时，那么这段时间就可能有几十万甚至几百万的请求积压在消息队列中。不过这个短暂的高峰期积压是完全可以的，因为高峰期过了之后，每秒钟就没有那么多的请求进入消息队列了，但是数据库依然会按照每秒 1k 个请求的速度处理。所以只要高峰期一过，系统就会快速的将积压的消息给处理掉。</p>
+<img src="%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97kafka/image-20220226165323165.png" alt="image-20220226165323165" style="zoom: 50%;" />
+
+<h1 id=""><a href="#" class="headerlink" title=""></a></h1>]]></content>
       <categories>
         <category>消息队列</category>
       </categories>
@@ -3962,35 +3962,6 @@ flush privileges;
       </tags>
   </entry>
   <entry>
-    <title>常用工具类整理</title>
-    <url>/2020/06/20/Java/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B7%A5%E5%85%B7%E7%B1%BB/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B7%A5%E5%85%B7%E7%B1%BB/</url>
-    <content><![CDATA[<p>一、Hutool工具包</p>
-<p>StrUtil.isBlank                 &#x2F;&#x2F; 判断字符串是否空（null或长度为0的字符串或者全空格的字符串）</p>
-<p>StrUtil.isEmpty              &#x2F;&#x2F; 判断字符串是否空（null或长度为0的字符串）</p>
-<p>StrUtil.padPre                &#x2F;&#x2F; 字符串补足n位</p>
-<p>StrUtil.padAfter             &#x2F;&#x2F; 字符串补足n位</p>
-<p>HexUtil.decodeHex        &#x2F;&#x2F; 十六进制串转字节数组</p>
-<p>HexUtil.encodeHexStr    &#x2F;&#x2F; 字节数据转十六进制串</p>
-<p>IdUtil.simpleId               &#x2F;&#x2F; 没有连接符的uuid</p>
-<p>DateUtil.format             &#x2F;&#x2F; date类型格式化成字符串</p>
-<p>ArrayUtil.addAll            &#x2F;&#x2F; 拼接多个同类型的数组</p>
-<p>ExceptionUtil.stacktraceToString(e)     &#x2F;&#x2F;获取完整的异常堆栈</p>
-<p>FileUtil.readString(file,charset)   &#x2F;&#x2F; 读取文本文件内容，返回文件内容</p>
-<p>RandomUtil.randomString(n)   &#x2F;&#x2F; 长度为n的随机串（数字+小写字符）</p>
-<p>MapUtil.getStr(mapObj,”key”);  &#x2F;&#x2F; 从map里获取string，不必toString之前的判断null了</p>
-<p>二、comman-lang工具包</p>
-<p>StringUtils.leftPad  &#x2F;&#x2F; 左侧填充字符串</p>
-<p>RandomStringUtils.randomAscii(n)  &#x2F;&#x2F; 创建随机ascii字符串</p>
-<p>三、</p>
-]]></content>
-      <categories>
-        <category>工具包</category>
-      </categories>
-      <tags>
-        <tag>工具包</tag>
-      </tags>
-  </entry>
-  <entry>
     <title>登录的实现</title>
     <url>/2021/01/21/Java/%E7%99%BB%E9%99%86/%E7%99%BB%E9%99%86/</url>
     <content><![CDATA[<h3 id="验证码防刷校验"><a href="#验证码防刷校验" class="headerlink" title="验证码防刷校验"></a>验证码防刷校验</h3><p>用户要是一直提交验证码</p>
@@ -4063,6 +4034,35 @@ flush privileges;
       </categories>
       <tags>
         <tag>代码</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>常用工具类整理</title>
+    <url>/2020/06/20/Java/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B7%A5%E5%85%B7%E7%B1%BB/%E7%AC%AC%E4%B8%89%E6%96%B9%E5%B7%A5%E5%85%B7%E7%B1%BB/</url>
+    <content><![CDATA[<p>一、Hutool工具包</p>
+<p>StrUtil.isBlank                 &#x2F;&#x2F; 判断字符串是否空（null或长度为0的字符串或者全空格的字符串）</p>
+<p>StrUtil.isEmpty              &#x2F;&#x2F; 判断字符串是否空（null或长度为0的字符串）</p>
+<p>StrUtil.padPre                &#x2F;&#x2F; 字符串补足n位</p>
+<p>StrUtil.padAfter             &#x2F;&#x2F; 字符串补足n位</p>
+<p>HexUtil.decodeHex        &#x2F;&#x2F; 十六进制串转字节数组</p>
+<p>HexUtil.encodeHexStr    &#x2F;&#x2F; 字节数据转十六进制串</p>
+<p>IdUtil.simpleId               &#x2F;&#x2F; 没有连接符的uuid</p>
+<p>DateUtil.format             &#x2F;&#x2F; date类型格式化成字符串</p>
+<p>ArrayUtil.addAll            &#x2F;&#x2F; 拼接多个同类型的数组</p>
+<p>ExceptionUtil.stacktraceToString(e)     &#x2F;&#x2F;获取完整的异常堆栈</p>
+<p>FileUtil.readString(file,charset)   &#x2F;&#x2F; 读取文本文件内容，返回文件内容</p>
+<p>RandomUtil.randomString(n)   &#x2F;&#x2F; 长度为n的随机串（数字+小写字符）</p>
+<p>MapUtil.getStr(mapObj,”key”);  &#x2F;&#x2F; 从map里获取string，不必toString之前的判断null了</p>
+<p>二、comman-lang工具包</p>
+<p>StringUtils.leftPad  &#x2F;&#x2F; 左侧填充字符串</p>
+<p>RandomStringUtils.randomAscii(n)  &#x2F;&#x2F; 创建随机ascii字符串</p>
+<p>三、</p>
+]]></content>
+      <categories>
+        <category>工具包</category>
+      </categories>
+      <tags>
+        <tag>工具包</tag>
       </tags>
   </entry>
   <entry>
@@ -4412,38 +4412,6 @@ flush privileges;
 <blockquote>
 <p>修改代码（只测试了Java代码的修改）后，按快捷键 <strong>Ctrl + Shift + F9</strong>，运行后会提示有变化是否重新加载，选yes。完成加载以后，就已经实现了热更新效果。</p>
 </blockquote>
-]]></content>
-      <categories>
-        <category>IDEA</category>
-      </categories>
-      <tags>
-        <tag>IDEA</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>IDEA配置与操作</title>
-    <url>/2021/11/19/Java/IDEA/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/</url>
-    <content><![CDATA[<h2 id="IDEA配置与操作"><a href="#IDEA配置与操作" class="headerlink" title="IDEA配置与操作"></a>IDEA配置与操作</h2><p>下面是Auto Import设置步骤详解。</p>
-<p>Settings→Editor→General→Auto Import<br>然后勾选Add unambiguous imports on the fly以及Optimize imports on the fly</p>
-<p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/1337265-20180413112619423-1610499505.png" alt="img"></p>
-<p>Add unambiguous imports on the fly：快速添加明确的导入。</p>
-<p>Optimize imports on the fly：快速优化导入，优化的意思即自动帮助删除无用的导入。</p>
-<h2 id="2-IntelliJ-Idea设置-自定义的-类代码注释模板"><a href="#2-IntelliJ-Idea设置-自定义的-类代码注释模板" class="headerlink" title="2.IntelliJ Idea设置(自定义的)类代码注释模板"></a>2.IntelliJ Idea设置(自定义的)类代码注释模板</h2><p>用IntelliJ Idea开发的时候代码没有注释或者注释不如人意，我们就自定义一下类代码的注释。</p>
-<p> 一、打开Settings – Editor – Code Style – File and Code Templates</p>
-<p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/image-20220123171022850.png" alt="image-20220123171022850"></p>
-<p> 二、注释模板内容</p>
-<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">COPY/**</span><br><span class="line">* $&#123;DESCRIPTION&#125;</span><br><span class="line">* @author 名字</span><br><span class="line">* @create $&#123;YEAR&#125;-$&#123;MONTH&#125;-$&#123;DAY&#125; $&#123;TIME&#125;</span><br><span class="line">**/</span><br></pre></td></tr></table></figure>
-
-
-
-<h2 id="3-取消Idea开始界面打开默认项目配置"><a href="#3-取消Idea开始界面打开默认项目配置" class="headerlink" title="3.取消Idea开始界面打开默认项目配置"></a>3.取消Idea开始界面打开默认项目配置</h2><p>去掉默认的勾选Reopen last project on startup（在启动的时候打开上次的项目），去掉勾选之后，点击确认。</p>
-<p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/image-20220123171130128.png" alt="image-20220123171130128"></p>
-<p>Confirm application exit   关闭了当前的工作空间  关闭确认提示    打开</p>
-<h2 id="4-IDEA使用—代码如何在方法之间加入一条分割线"><a href="#4-IDEA使用—代码如何在方法之间加入一条分割线" class="headerlink" title="4.IDEA使用—代码如何在方法之间加入一条分割线"></a>4.IDEA使用—代码如何在方法之间加入一条分割线</h2><p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/image-20220123171433972.png" alt="image-20220123171433972"><br>把【Show method separators】打上勾即可。</p>
-<h2 id="5-IDEA查看源码返回上一级快捷键"><a href="#5-IDEA查看源码返回上一级快捷键" class="headerlink" title="5.IDEA查看源码返回上一级快捷键"></a>5.IDEA查看源码返回上一级快捷键</h2><p>快捷键 alt + 方向左键 放回上一级</p>
-<h2 id="6-打印日志时不同颜色插件"><a href="#6-打印日志时不同颜色插件" class="headerlink" title="6.打印日志时不同颜色插件"></a>6.打印日志时不同颜色插件</h2><p>Grep Console</p>
-<h2 id="7-mapper与xml文件切换插件"><a href="#7-mapper与xml文件切换插件" class="headerlink" title="7.mapper与xml文件切换插件"></a>7.mapper与xml文件切换插件</h2><p>Free Mybatis plugin</p>
-<h2 id="8-IDEA插件文件夹"><a href="#8-IDEA插件文件夹" class="headerlink" title="8.IDEA插件文件夹"></a>8.IDEA插件文件夹</h2><p>C:\Users\【用户名】\AppData\Roaming\JetBrains\IntelliJIdea2020.1</p>
 ]]></content>
       <categories>
         <category>IDEA</category>
@@ -4821,6 +4789,38 @@ flush privileges;
       </categories>
       <tags>
         <tag>多线程</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>IDEA配置与操作</title>
+    <url>/2021/11/19/Java/IDEA/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<h2 id="IDEA配置与操作"><a href="#IDEA配置与操作" class="headerlink" title="IDEA配置与操作"></a>IDEA配置与操作</h2><p>下面是Auto Import设置步骤详解。</p>
+<p>Settings→Editor→General→Auto Import<br>然后勾选Add unambiguous imports on the fly以及Optimize imports on the fly</p>
+<p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/1337265-20180413112619423-1610499505.png" alt="img"></p>
+<p>Add unambiguous imports on the fly：快速添加明确的导入。</p>
+<p>Optimize imports on the fly：快速优化导入，优化的意思即自动帮助删除无用的导入。</p>
+<h2 id="2-IntelliJ-Idea设置-自定义的-类代码注释模板"><a href="#2-IntelliJ-Idea设置-自定义的-类代码注释模板" class="headerlink" title="2.IntelliJ Idea设置(自定义的)类代码注释模板"></a>2.IntelliJ Idea设置(自定义的)类代码注释模板</h2><p>用IntelliJ Idea开发的时候代码没有注释或者注释不如人意，我们就自定义一下类代码的注释。</p>
+<p> 一、打开Settings – Editor – Code Style – File and Code Templates</p>
+<p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/image-20220123171022850.png" alt="image-20220123171022850"></p>
+<p> 二、注释模板内容</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">COPY/**</span><br><span class="line">* $&#123;DESCRIPTION&#125;</span><br><span class="line">* @author 名字</span><br><span class="line">* @create $&#123;YEAR&#125;-$&#123;MONTH&#125;-$&#123;DAY&#125; $&#123;TIME&#125;</span><br><span class="line">**/</span><br></pre></td></tr></table></figure>
+
+
+
+<h2 id="3-取消Idea开始界面打开默认项目配置"><a href="#3-取消Idea开始界面打开默认项目配置" class="headerlink" title="3.取消Idea开始界面打开默认项目配置"></a>3.取消Idea开始界面打开默认项目配置</h2><p>去掉默认的勾选Reopen last project on startup（在启动的时候打开上次的项目），去掉勾选之后，点击确认。</p>
+<p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/image-20220123171130128.png" alt="image-20220123171130128"></p>
+<p>Confirm application exit   关闭了当前的工作空间  关闭确认提示    打开</p>
+<h2 id="4-IDEA使用—代码如何在方法之间加入一条分割线"><a href="#4-IDEA使用—代码如何在方法之间加入一条分割线" class="headerlink" title="4.IDEA使用—代码如何在方法之间加入一条分割线"></a>4.IDEA使用—代码如何在方法之间加入一条分割线</h2><p><img src="/IDEA%E9%85%8D%E7%BD%AE%E4%B8%8E%E6%93%8D%E4%BD%9C/image-20220123171433972.png" alt="image-20220123171433972"><br>把【Show method separators】打上勾即可。</p>
+<h2 id="5-IDEA查看源码返回上一级快捷键"><a href="#5-IDEA查看源码返回上一级快捷键" class="headerlink" title="5.IDEA查看源码返回上一级快捷键"></a>5.IDEA查看源码返回上一级快捷键</h2><p>快捷键 alt + 方向左键 放回上一级</p>
+<h2 id="6-打印日志时不同颜色插件"><a href="#6-打印日志时不同颜色插件" class="headerlink" title="6.打印日志时不同颜色插件"></a>6.打印日志时不同颜色插件</h2><p>Grep Console</p>
+<h2 id="7-mapper与xml文件切换插件"><a href="#7-mapper与xml文件切换插件" class="headerlink" title="7.mapper与xml文件切换插件"></a>7.mapper与xml文件切换插件</h2><p>Free Mybatis plugin</p>
+<h2 id="8-IDEA插件文件夹"><a href="#8-IDEA插件文件夹" class="headerlink" title="8.IDEA插件文件夹"></a>8.IDEA插件文件夹</h2><p>C:\Users\【用户名】\AppData\Roaming\JetBrains\IntelliJIdea2020.1</p>
+]]></content>
+      <categories>
+        <category>IDEA</category>
+      </categories>
+      <tags>
+        <tag>IDEA</tag>
       </tags>
   </entry>
   <entry>
