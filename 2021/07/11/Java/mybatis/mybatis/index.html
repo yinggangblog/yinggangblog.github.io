@@ -111,14 +111,14 @@
 <p><strong>Debug跟读源码</strong></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">sqlSession.getMapper(StudentMapper.class);</span><br><span class="line">和</span><br><span class="line">mapper.selectAll();</span><br></pre></td></tr></table></figure></li>
 </ul>
-<p><img src="/Untitled/image-20200820174139362.png" alt="image-20200820174139362"></p>
+<p><img src="/.io//image-20200820174139362.png" alt="image-20200820174139362"></p>
 <h2 id="mybatis使用"><a href="#mybatis使用" class="headerlink" title="mybatis使用"></a>mybatis使用</h2><h2 id="mapper-与xml对应关系"><a href="#mapper-与xml对应关系" class="headerlink" title="mapper 与xml对应关系"></a>mapper 与xml对应关系</h2><p>mapper                              ——————————&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;                mapper.xml  </p>
-<p><img src="/Untitled/image-20220405173621291.png" alt="image-20220405173621291"></p>
+<p><img src="/.io//image-20220405173621291.png" alt="image-20220405173621291"></p>
 <h2 id="动态sql"><a href="#动态sql" class="headerlink" title="动态sql"></a>动态sql</h2><h3 id="1-where-标签"><a href="#1-where-标签" class="headerlink" title="1.where 标签"></a>1.where 标签</h3><h3 id="2-if-标签"><a href="#2-if-标签" class="headerlink" title="2. if  标签"></a>2. if  标签</h3><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="operator">&lt;</span><span class="keyword">where</span><span class="operator">&gt;</span>：条件标签。如果有动态条件，则使用该标签代替 <span class="keyword">where</span> 关键字。</span><br><span class="line"></span><br><span class="line"><span class="operator">&lt;</span>if test<span class="operator">=</span>“条件判断”<span class="operator">&gt;</span></span><br><span class="line">	查询条件拼接</span><br><span class="line"><span class="operator">&lt;</span><span class="operator">/</span>if<span class="operator">&gt;</span></span><br></pre></td></tr></table></figure>
 
 
 
-<p><img src="/Untitled/image-20220405174735614.png" alt="image-20220405174735614"></p>
+<p><img src="/.io//image-20220405174735614.png" alt="image-20220405174735614"></p>
 <h3 id="3-foreach标签-in-1-2-3"><a href="#3-foreach标签-in-1-2-3" class="headerlink" title="3.foreach标签 ( in (1,2,3))"></a>3.foreach标签 ( in (1,2,3))</h3><p>例如：</p>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">SELECT</span> <span class="operator">*</span> <span class="keyword">FROM</span> student  <span class="keyword">WHERE</span> id <span class="keyword">IN</span> (<span class="number">1</span>,<span class="number">2</span>,<span class="number">5</span>)</span><br></pre></td></tr></table></figure>
 
@@ -126,24 +126,38 @@
 
 
 
-<p><img src="/Untitled/image-20220405180436103.png" alt="image-20220405180436103"></p>
+<p><img src="/.io//image-20220405180436103.png" alt="image-20220405180436103"></p>
 <p>collection：参数容器类型， (list-集合， array-数组)。<br>open：开始的 SQL 语句。<br>close：结束的 SQL 语句。<br>item：参数变量名。<br>separator：分隔符。</p>
-<p><img src="/mybatis/image-20220410233050827.png" alt="image-20220410233050827"></p>
+<img src="/.io//07/11/Java/mybatis/mybatis/image-20220410233050827.png" class title="image-20220410233050827">
+
 <h3 id="4-sql片段的抽取"><a href="#4-sql片段的抽取" class="headerlink" title="4.sql片段的抽取"></a>4.sql片段的抽取</h3><p><strong>定义：</strong></p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sql</span> <span class="attr">id</span>=<span class="string">&quot;片段名字&quot;</span>&gt;</span> sql片段 <span class="tag">&lt;/<span class="name">sql</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p><strong>引用：</strong></p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">include</span> <span class="attr">refid</span>=<span class="string">&quot;片段名字&quot;</span>&gt;</span><span class="tag">&lt;/<span class="name">include</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<p><img src="/Untitled/image-20220405180924111.png" alt="image-20220405180924111"></p>
+<p><img src="/.io//image-20220405180924111.png" alt="image-20220405180924111"></p>
 <h2 id="resultMap"><a href="#resultMap" class="headerlink" title="resultMap"></a>resultMap</h2><p>字段和实体对象属性的映射关系</p>
 <h2 id="一对一查询"><a href="#一对一查询" class="headerlink" title="一对一查询"></a>一对一查询</h2><p>卡号 -人</p>
-<p><img src="/mybatis/image-20220405183520673.png" alt="image-20220405183520673"></p>
+<img src="/.io//07/11/Java/mybatis/mybatis/image-20220405183520673.png" class title="image-20220405183520673">
+
+
+
+
+
 <h2 id="一对多查询"><a href="#一对多查询" class="headerlink" title="一对多查询"></a>一对多查询</h2><p>班级学生</p>
-<p><img src="/mybatis/image-20220411001204161.png" alt="image-20220411001204161"></p>
+<img src="/.io//07/11/Java/mybatis/mybatis/image-20220411001204161.png" class title="image-20220411001204161">
+
+
+
 <h2 id="多对多查询"><a href="#多对多查询" class="headerlink" title="多对多查询"></a>多对多查询</h2><p>学生 课程</p>
 <p>多对多</p>
-<p><img src="/mybatis/image-20220411002638101.png" alt="image-20220411002638101"></p>
+<img src="/.io//07/11/Java/mybatis/mybatis/image-20220411002638101.png" class title="image-20220411002638101">
+
+
+
+
+
 <p>column 属性：<strong>表</strong>中字段名称</p>
 <p>property 属性：被包含<strong>对象</strong>的<strong>变量</strong>名</p>
  

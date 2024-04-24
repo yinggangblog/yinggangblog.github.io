@@ -195,7 +195,7 @@
 <li>返回值是否可以使用Optional；</li>
 </ol>
 <p>上面的每一个部分，后面会详细说明为什么是坏味道，以及如何来修改。</p>
-<h2 id=""><a href="#" class="headerlink" title=""></a></h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><p>有一句叫做”<strong>当你开始思考命名时，就说明你在进阶了</strong>“，前面说了命名的最基本原则就是要有意义，那什么样子的命名是无意义的，是坏味道呢？下面列举几种坏味道的命名。</p>
+<h2 id><a href="#" class="headerlink" title></a></h2><h3 id="命名"><a href="#命名" class="headerlink" title="命名"></a>命名</h3><p>有一句叫做”<strong>当你开始思考命名时，就说明你在进阶了</strong>“，前面说了命名的最基本原则就是要有意义，那什么样子的命名是无意义的，是坏味道呢？下面列举几种坏味道的命名。</p>
 <h4 id="不精准的命名"><a href="#不精准的命名" class="headerlink" title="不精准的命名"></a>不精准的命名</h4><p>看一段代码：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title function_">processChapter</span><span class="params">(<span class="type">long</span> chapterId)</span> &#123;</span><br><span class="line">  <span class="type">Chapter</span> <span class="variable">chapter</span> <span class="operator">=</span> <span class="built_in">this</span>.repository.findByChapterId(chapterId);</span><br><span class="line">  <span class="keyword">if</span> (chapter == <span class="literal">null</span>) &#123;</span><br><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> <span class="title class_">IllegalArgumentException</span>(<span class="string">&quot;Unknown chapter [&quot;</span> + chapterId + <span class="string">&quot;]&quot;</span>);  </span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  chapter.setTranslationState(TranslationState.TRANSLATING);</span><br><span class="line">  <span class="built_in">this</span>.repository.save(chapter);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
@@ -495,7 +495,7 @@
 <p>  GenerateAllSetter（快速生成get set）</p>
 <p>​    JRebel 热加载插件</p>
 <p>3.浏览器扩展</p>
-<p><img src="/OPPO%5C1713967959900.png" alt="1713967959900"></p>
+<p><img src="/.io//OPPO%5C1713967959900.png" alt="1713967959900"></p>
  
       <!-- reward -->
       

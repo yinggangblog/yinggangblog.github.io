@@ -132,7 +132,7 @@
 <p>比如表达式person -&gt; person.getAge(); </p>
 <p>传入参数是person，</p>
 <p>返回值是person.getAge()，那么方法引用Person::getAge就对应着Function&lt;Person,Integer&gt;类型。</p>
-<p>题一：下面这段代码，进行的操作是，把List<String>里面的String全部大写并返还新的ArrayList<String>，在前面的例子中我们是这么写的：</p>
+<p>题一：下面这段代码，进行的操作是，把List<String>里面的String全部大写并返还新的ArrayList<String>，在前面的例子中我们是这么写的：</String></String></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">collected = collected.stream().map(string -&gt; string.toUpperCase()).collect(Collectors.toList());</span><br></pre></td></tr></table></figure>
 
 <p>现在也可以被替换成下面的写法：</p>

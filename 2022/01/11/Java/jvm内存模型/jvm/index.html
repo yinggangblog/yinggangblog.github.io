@@ -103,7 +103,7 @@
     <div class="article-entry" itemprop="articleBody">
        
   <h1 id="JVM内存结构"><a href="#JVM内存结构" class="headerlink" title="JVM内存结构"></a>JVM内存结构</h1><p>java虚拟机在执行程序的过程中会将内存划分为不同的数据区域</p>
-<img src="jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvMTU3MTM2MzMwOTUzNC5qcGc" alt="image" style="zoom: 50%;" />
+<style>.hcipsokcnppt{zoom: 50%;}</style><img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvMTU3MTM2MzMwOTUzNC5qcGc" class="hcipsokcnppt" alt="image">
 
 
 
@@ -123,7 +123,7 @@
 <li><p>第三，JVM不同区域的占用内存大小不同，一般情况下堆最大，程序计数器较小。那么最大的区域会放什么？当然就是Java中最多的“对象”了。</p>
 </li>
 </ul>
-<h2 id="线程共享"><a href="#线程共享" class="headerlink" title="线程共享"></a>线程共享</h2><h3 id="堆（Heap）"><a href="#堆（Heap）" class="headerlink" title="堆（Heap）"></a>堆（Heap）</h3><img src="jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvaGVhcC5qcGc" alt="image" style="zoom:50%;" />
+<h2 id="线程共享"><a href="#线程共享" class="headerlink" title="线程共享"></a>线程共享</h2><h3 id="堆（Heap）"><a href="#堆（Heap）" class="headerlink" title="堆（Heap）"></a>堆（Heap）</h3><style>.yeknveturdir{zoom:50%;}</style><img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvaGVhcC5qcGc" class="yeknveturdir" alt="image">
 
 <p>堆可以细分为：</p>
 <ul>
@@ -150,17 +150,19 @@
 <p>正因为如此相像，Java虚拟机规范把方法区描述为堆的一个逻辑部分，但目前实际上是与Java堆分开的（Non-Heap）。</p>
 <p>方法区个性化的是，它存储的是已被虚拟机加载的类信息、常量、静态变量、即时编译器编译后的代码等数据。</p>
 <p>方法区的内存回收目标主要是针对常量池的回收和对类型的卸载，一般来说这个区域的回收“成绩”比较难以令人满意，尤其是类型的卸载，条件相当苛刻，但是回收确实是有必要的。</p>
-<img src="jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvbWV0aG9kYXJlYS5qcGc" alt="image" style="zoom: 50%;" />
+<style>.jwiqsfxhnnjp{zoom: 50%;}</style><img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvbWV0aG9kYXJlYS5qcGc" class="jwiqsfxhnnjp" alt="image">
 
 <h2 id="线程私有"><a href="#线程私有" class="headerlink" title="线程私有"></a>线程私有</h2><h3 id="程序计数器（Program-Counter-Register）"><a href="#程序计数器（Program-Counter-Register）" class="headerlink" title="程序计数器（Program Counter Register）"></a>程序计数器（Program Counter Register）</h3><p>关于程序计数器我们已经得知：占用内存较小，现成私有。它是唯一没有OutOfMemoryError异常的区域。</p>
 <p>程序计数器的作用可以看做是当前线程所执行的字节码的行号指示器，字节码解释器工作时就是通过改变计数器的值来选取下一条字节码指令。其中，分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖计数器来完成。</p>
 <p>Java虚拟机的多线程是通过线程轮流切换并分配处理器执行时间的方式来实现的，在任何一个确定的时刻，一个处理器（对于多核处理器来说是一个内核）只会执行一条线程中的指令。</p>
-<p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvcHJvZ3JhbS1jb3VudGVyLmpwZw" alt="image"></p>
+<img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvcHJvZ3JhbS1jb3VudGVyLmpwZw" class title="image">
+
 <p>因此，为了线程切换后能恢复到正确的执行位置，每条线程都需要有一个独立的程序计数器，各条线程之间的计数器互不影响，独立存储，我们称这类内存区域为“线程私有”的内存。</p>
 <p>如果线程正在执行的是一个Java方法，这个计数器记录的是正在执行的虚拟机字节码指令的地址；如果正在执行的是Natvie方法，这个计数器值则为空（Undefined）。</p>
 <h3 id="虚拟机栈（JVM-Stacks）"><a href="#虚拟机栈（JVM-Stacks）" class="headerlink" title="虚拟机栈（JVM Stacks）"></a>虚拟机栈（JVM Stacks）</h3><p>虚拟机栈线程私有，生命周期与线程相同。</p>
 <p>栈帧(Stack Frame)是用于支持虚拟机进行方法调用和方法执行的数据结构。栈帧存储了方法的局部变量表、操作数栈、动态连接和方法返回地址等信息。每一个方法从调用至执行完成的过程，都对应着一个栈帧在虚拟机栈里从入栈到出栈的过程。</p>
-<p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvc3RhY2suanBn" alt="image"></p>
+<img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvc3RhY2suanBn" class title="image">
+
 <p>局部变量表(Local Variable Table)是一组变量值存储空间，用于存放方法参数和方法内定义的局部变量。包括8种基本数据类型、对象引用（reference类型）和returnAddress类型（指向一条字节码指令的地址）。</p>
 <p>其中64位长度的long和double类型的数据会占用2个局部变量空间（Slot），其余的数据类型只占用1个。</p>
 <p>如果线程请求的栈深度大于虚拟机所允许的深度，将抛出StackOverflowError异常；如果虚拟机栈动态扩展时无法申请到足够的内存时会抛出OutOfMemoryError异常。</p>
@@ -170,11 +172,20 @@
 <h3 id="本地方法栈（Native-Method-Stacks）"><a href="#本地方法栈（Native-Method-Stacks）" class="headerlink" title="本地方法栈（Native Method Stacks）"></a>本地方法栈（Native Method Stacks）</h3><p>本地方法栈（Native Method Stacks）与虚拟机栈作用相似，也会抛出StackOverflowError和OutOfMemoryError异常。</p>
 <p>区别在于虚拟机栈为虚拟机执行Java方法（字节码）服务，而本地方法栈是为虚拟机使用到的Native方法服务。</p>
 <h2 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h2><p>经。</p>
-<p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvanZtLXhtaW5kLmpwZw" alt="image"></p>
-<h1 id="设置内存参数"><a href="#设置内存参数" class="headerlink" title="设置内存参数"></a>设置内存参数</h1><p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvaGVhcC5qcGc" alt="image"></p>
+<img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvanZtLXhtaW5kLmpwZw" class title="image">
+
+
+
+
+
+
+
+<h1 id="设置内存参数"><a href="#设置内存参数" class="headerlink" title="设置内存参数"></a>设置内存参数</h1><img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvaGVhcC5qcGc" class title="image">
+
 <p>图中展示了堆中三个区域：Eden、From Survivor、To Survivor。从图中可以也可以看到它们的大小比例，准确来说是：8:1:1。</p>
 <p>还记得在设置JVM时，常用的类似-Xms和-Xmx等参数吗？对的它们就是用来说设置堆中各区域的大小的。</p>
-<p> <img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvc3RhY2stc2l6ZS5wbmc" alt="image"></p>
+ <img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvc3RhY2stc2l6ZS5wbmc" class title="image">
+
 <p>控制参数详解：</p>
 <ul>
 <li>-Xms设置<strong>堆的最小空间</strong>大小。</li>
@@ -207,7 +218,7 @@
 <p>“<strong>当需要排查各种内存溢出，内存泄露问题时，当垃圾成为系统达到更高并发量的瓶颈时，我们就需要对GC的自动回收实施必要的监控和调节。</strong>”</p>
 <p>JVM中程序计数器、虚拟机栈、本地方法栈3个区域随线程而生随线程而灭。栈帧随着方法的进入和退出做入栈和出栈操作，实现了自动的内存清理。它们的内存分配和回收都具有确定性。</p>
 <p>因此，GC垃圾回收主要<strong>集中在堆和方法区</strong>，在程序运行期间，这部分内存的分配和使用都是动态的。</p>
-<h2 id="GC回收流程"><a href="#GC回收流程" class="headerlink" title="GC回收流程"></a>GC回收流程</h2><p>​               <img src="/jvm/aHR0cHM6Ly9pbWcxLnR1aWNvb2wuY29tL3JNM1FSM3EuanBnIXdlYg" alt="img"></p>
+<h2 id="GC回收流程"><a href="#GC回收流程" class="headerlink" title="GC回收流程"></a>GC回收流程</h2><p>​               <img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cHM6Ly9pbWcxLnR1aWNvb2wuY29tL3JNM1FSM3EuanBnIXdlYg" class title="img"></p>
 <p>（1）Eden区域是用来存放使用new或者newInstance等方式创建的对象，默认都是存放在Eden区，除非这个对象太大，或者超过了设定的阈值-XX:PretenureSizeThresold,这样的对象会被直接分配到Old区域。</p>
 <p>（2）2个Survivor（幸存）区，一般称S0，S1，理论上他们是一样大的，解释一下，他们是如何工作的：</p>
 <p>在不断创建对象的过程中，Eden区会满，这时候会开始做Young G也叫Minor GC，而Young空间的第一次GC就是找出Eden区中，幸存活着的对象，然后将这些对象，放到S0，或S1区中的其中一个， 假设第一次选择了S0，它会逐步将活着的对象拷贝到S0区域，但是如果S0区域满了，剩下活着的对象只能放old区域了，接下来要做的是，将Eden区域 清空，此时时候S1区域也是空的。</p>
@@ -218,27 +229,31 @@
 <p><strong>引用计数算法</strong>：给对象添加一个引用计数器，每当有一个地方引用它时计数器加1，引用释放时计数减1，当计数器为0时可以回收。</p>
 <p>引用计数算法实现简单，判断高效，在微软COM和Python语言等被广泛使用，但在主流的Java虚拟机中没有使用该方法，主要是因为无法解决<strong>对象相互循环引用</strong>的问题。</p>
 <p><strong>可达性分析算法</strong>：基本思想是通过一系列称为“GC Root”的对象（如系统类加载器、栈中的对象、处于激活状态的线程等）作为起点，基于对象引用关系，开始向下搜索，所走过的路径称为引用链，当一个对象到GC Root没有任何引用链相连，证明对象是不可用的。</p>
-<p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvZ2Mtcm9vdC5qcGc" alt="image"></p>
+<img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvZ2Mtcm9vdC5qcGc" class title="image">
+
 <p>上图中中绿色部分为存活对象，灰色部分为可回收对象。虽然灰色部分内部依旧有关联，但它们到GC Root是不可达的。 </p>
 <h2 id="面试问题"><a href="#面试问题" class="headerlink" title="面试问题"></a>面试问题</h2><p>面试官，说说Java GC都用了哪些算法？分别应用在什么地方？</p>
 <p>答：复制算法、标记清除、标记整理……</p>
 <h2 id="标记清除算法"><a href="#标记清除算法" class="headerlink" title="标记清除算法"></a>标记清除算法</h2><p>标记清除（Mark-Sweep）算法，包含“标记”和“清除”两个阶段：首先标记出所有需要回收的对象，在标记完成后统一回收掉所有被标记的对象。</p>
 <p>标记清除算法是最基础的收集算法，后续的收集算法都是基于该思路并对其缺点进行改进而得到的。</p>
-<p>​           <img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvbWFyay1jbGVhbi5naWY" alt="image"> </p>
+<p>​           <img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvbWFyay1jbGVhbi5naWY" class title="image"> </p>
 <p>主要缺点：一个是效率问题，标记和清除过程的效率都不高；另外是空间问题，标记清除之后会产生大量不连续的内存碎片，空间碎片太多可能会导致，当程序在以后的运行过程中需要分配较大对象时无法找到足够的连续内存而不得不提前触发另一次垃圾收集动作。</p>
 <h2 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h2><p>复制（Copying）算法：将可用内存按容量划分为大小相等的两块，每次只使用其中的一块。当一块内存用完了，就将还存活着的对象复制到另外一块上，然后清理掉前一块。</p>
-<p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvZ2MtY29weWluZy5qcGc" alt="image"></p>
+<img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvZ2MtY29weWluZy5qcGc" class title="image">
+
 <p>每次对半区内存回收时、内存分配时就不用考虑内存碎片等复杂情况，只要移动堆顶指针，按顺序分配内存即可，实现简单，运行高效。</p>
 <p>缺点：将内存缩小为一半，性价比低，持续复制长生存期的对象则导致效率低下。</p>
 <p>JVM堆中新生代便采用复制算法。回到最初推分配结构图。</p>
-<p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvaGVhcC5qcGc" alt="image"></p>
+<img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvaGVhcC5qcGc" class title="image">
+
 <p>在GC回收过程中，当Eden区满时，还存活的对象会被复制到其中一个Survivor区；当回收时，会将Eden和使用的Survivor区还存活的对象，复制到另外一个Survivor区，然后对Eden和用过的Survivor区进行清理。</p>
 <p>如果另外一个Survivor区没有足够的内存存储时，则会进入老年代。</p>
 <p>这里针对哪些对象会进入老年代有这样的机制：对象每经历一次复制，年龄加1，达到晋升年龄阈值后，转移到老年代。</p>
 <p>在这整个过程中，由于Eden中的对象属于像浮萍一样“瞬生瞬灭”的对象，所以并不需要1：1的比例来分配内存，而是采用了8：1：1的比例来分配。</p>
 <p>而针对那些像“水熊虫”一样，历经多次清理依旧存活的对象，则会进入老年代，而老年的清理算法则采用下面要讲到的“标记整理算法”。</p>
 <h2 id="标记整理算法"><a href="#标记整理算法" class="headerlink" title="标记整理算法"></a>标记整理算法</h2><p>标记整理（Mark-Compact）算法：标记过程与“标记-清除”算法一样，但后续步骤不是直接对可回收对象进行清理，而是让所有存活的对象都向一端移动，然后直接清理掉端边界以外的内存。</p>
-<p><img src="/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvbWFyay1jb21wYWN0LmpwZw" alt="image"></p>
+<img src="/.io//01/11/Java/jvm%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/jvm/aHR0cDovL3d3dy5jaG91cGFuZ3hpYS5jb20vd3AtY29udGVudC91cGxvYWRzLzIwMTkvMTAvbWFyay1jb21wYWN0LmpwZw" class title="image">
+
 <p>这种算法不既不用浪费50%的内存，也解决了复制算法在对象存活率较高时的效率低下问题。</p>
 <h2 id="分代收集算法"><a href="#分代收集算法" class="headerlink" title="分代收集算法"></a>分代收集算法</h2><p>分代收集算法，基本思路：将Java的堆内存逻辑上分成两块，新生代和老年代，针对不同存活周期、不同大小的对象采取不同的垃圾回收策略。</p>
 <p>而在新生代中大多数对象都是瞬间对象，只有少量对象存活，复制较少对象即可完成清理，因此采用复制算法。而针对老年代中的对象，存活率较高，又没有额外的担保内存，因此采用标记整理算法。</p>

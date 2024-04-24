@@ -137,7 +137,7 @@
 
 
 </li>
-<li><p>写法3  list.sort( Comparator<T>）</p>
+<li><p>写法3  list.sort( Comparator<T>）</T></p>
 </li>
 </ul>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//自定义排序2</span></span><br><span class="line">list.sort(<span class="keyword">new</span> <span class="title class_">Comparator</span>&lt;Student&gt;() &#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">compare</span><span class="params">(Student o1, Student o2)</span> &#123;</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// 升序</span></span><br><span class="line">        <span class="keyword">return</span> o1.getAge() - o2.getAge();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>

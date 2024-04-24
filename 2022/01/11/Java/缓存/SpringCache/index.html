@@ -115,7 +115,8 @@
 </ul>
 <p>官网地址：<a target="_blank" rel="noopener" href="https://docs.spring.io/spring-framework/docs/5.2.10.RELEASE/spring-framework-reference/integration.html#cache-strategie">https://docs.spring.io/spring-framework/docs/5.2.10.RELEASE/spring-framework-reference/integration.html#cache-strategie</a></p>
 <p>缓存注解配置</p>
-<p><img src="/SpringCache/image-20201228171806703.png" alt="image-20201228171806703"></p>
+<img src="/.io//01/11/Java/%E7%BC%93%E5%AD%98/SpringCache/image-20201228171806703.png" class title="image-20201228171806703">
+
 <h4 id="2、基础概念"><a href="#2、基础概念" class="headerlink" title="2、基础概念"></a>2、基础概念</h4><p>从3.1版本开始，Spring 框架就支持透明地向现有 Spring 应用程序添加缓存。与事务支持类似，缓存抽象允许在对代码影响最小的情况下一致地使用各种缓存解决方案。从 Spring 4.1 开始，缓存抽象在JSR-107注释和更多定制选项的支持下得到了显著扩展。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">*  8、整合SpringCache简化缓存开发</span></span><br><span class="line"><span class="comment">*      1、引入依赖</span></span><br><span class="line"><span class="comment">*          spring-boot-starter-cache</span></span><br><span class="line"><span class="comment">*      2、写配置</span></span><br><span class="line"><span class="comment">*          1、自动配置了那些</span></span><br><span class="line"><span class="comment">*              CacheAutoConfiguration会导入 RedisCacheConfiguration</span></span><br><span class="line"><span class="comment">*              自动配置好了缓存管理器，RedisCacheManager</span></span><br><span class="line"><span class="comment">*          2、配置使用redis作为缓存</span></span><br><span class="line"><span class="comment">*          Spring.cache.type=redis</span></span><br><span class="line"><span class="comment">*</span></span><br><span class="line"><span class="comment">*       4、原理</span></span><br><span class="line"><span class="comment">*       CacheAutoConfiguration -&gt;RedisCacheConfiguration -&gt;</span></span><br><span class="line"><span class="comment">*       自动配置了 RedisCacheManager -&gt;初始化所有的缓存 -&gt; 每个缓存决定使用什么配置</span></span><br><span class="line"><span class="comment">*       -&gt;如果redisCacheConfiguration有就用已有的，没有就用默认的</span></span><br><span class="line"><span class="comment">*       -&gt;想改缓存的配置，只需要把容器中放一个 RedisCacheConfiguration 即可</span></span><br><span class="line"><span class="comment">*       -&gt;就会应用到当前 RedisCacheManager管理所有缓存分区中</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
 
@@ -138,7 +139,16 @@
 <p>总结业务流程：</p>
 <p>如果忘了这个技术点看下做的笔记的例子，然后去官网看下文档，温故而知新</p>
 <p>流程图</p>
-<p><img src="/SpringCache/image-20201228171552816.png" alt="image-20201228171552816"></p>
+<img src="/.io//01/11/Java/%E7%BC%93%E5%AD%98/SpringCache/image-20201228171552816.png" class title="image-20201228171552816">
+
+
+
+
+
+
+
+
+
  
       <!-- reward -->
       

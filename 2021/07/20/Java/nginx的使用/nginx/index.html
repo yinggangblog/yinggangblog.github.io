@@ -142,30 +142,43 @@
 
 
 <h3 id="1-Nginx-搭建域名环境一（反向代理配置）"><a href="#1-Nginx-搭建域名环境一（反向代理配置）" class="headerlink" title="1 Nginx 搭建域名环境一（反向代理配置）"></a>1 Nginx 搭建域名环境一（反向代理配置）</h3><p>什么是 反向代理?</p>
-<p><img src="/nginx/image-20201029051037570.png" alt="image-20201029051037570"></p>
+<img src="/.io//07/20/Java/nginx%E7%9A%84%E4%BD%BF%E7%94%A8/nginx/image-20201029051037570.png" class title="image-20201029051037570">
+
 <p>vi nginx.conf 文件后在底部有该条语句：</p>
 <ul>
 <li>引入nginx下的 conf.d 下面的conf文件</li>
 <li>那么我们开始在该目录下增加关于 谷粒商城的 nginx</li>
 </ul>
-<p><img src="/nginx/image-20201029045921936.png" alt="image-20201029045921936"></p>
+<img src="/.io//07/20/Java/nginx%E7%9A%84%E4%BD%BF%E7%94%A8/nginx/image-20201029045921936.png" class title="image-20201029045921936">
+
 <p>拷贝原先默认的 conf</p>
-<p><img src="/nginx/image-20201029050207857.png" alt="image-20201029050207857"></p>
+<img src="/.io//07/20/Java/nginx%E7%9A%84%E4%BD%BF%E7%94%A8/nginx/image-20201029050207857.png" class title="image-20201029050207857">
+
 <p>修改</p>
-<p><img src="/nginx/image-20201029050136324.png" alt="image-20201029050136324"></p>
+<img src="/.io//07/20/Java/nginx%E7%9A%84%E4%BD%BF%E7%94%A8/nginx/image-20201029050136324.png" class title="image-20201029050136324">
+
+
+
 <h3 id="4-2-Nginx-搭建域名环境二-（负载均衡到网关）"><a href="#4-2-Nginx-搭建域名环境二-（负载均衡到网关）" class="headerlink" title="4.2 Nginx 搭建域名环境二 （负载均衡到网关）"></a>4.2 Nginx 搭建域名环境二 （负载均衡到网关）</h3><p> 配置 UpStream</p>
-<p><img src="/nginx/image-20201029050256216.png" alt="image-20201029050256216"></p>
+<img src="/.io//07/20/Java/nginx%E7%9A%84%E4%BD%BF%E7%94%A8/nginx/image-20201029050256216.png" class title="image-20201029050256216">
+
+
+
 <p>使用nginx实现负载平衡的最简单配置如下,官网地址：<a target="_blank" rel="noopener" href="https://nginx.org/en/docs/http/load_balancing.html">https://nginx.org/en/docs/http/load_balancing.html</a></p>
 <figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">http &#123;</span><br><span class="line">    upstream myapp1 &#123;</span><br><span class="line">        server srv1.example.com;</span><br><span class="line">        server srv2.example.com;</span><br><span class="line">        server srv3.example.com;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    server &#123;</span><br><span class="line">        listen 80;</span><br><span class="line"></span><br><span class="line">        location / &#123;</span><br><span class="line">            proxy_pass http://myapp1;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>同时在 本机上 hosts 文件上那个配置 域名映射</p>
-<p><img src="/../../%E7%AC%94%E8%AE%B0%20git/brain-map/docs/%E8%B0%B7%E7%B2%92%E5%95%86%E5%9F%8E%E9%A1%B9%E7%9B%AE%E7%AC%94%E8%AE%B0/%E5%88%86%E5%B8%83%E5%BC%8F%E9%AB%98%E7%BA%A7%E7%AF%87/image/image-20201029050625740.png" alt="image-20201029050625740"></p>
+<p><img src="/.io//../%E7%AC%94%E8%AE%B0%20git/brain-map/docs/%E8%B0%B7%E7%B2%92%E5%95%86%E5%9F%8E%E9%A1%B9%E7%9B%AE%E7%AC%94%E8%AE%B0/%E5%88%86%E5%B8%83%E5%BC%8F%E9%AB%98%E7%BA%A7%E7%AF%87/image/image-20201029050625740.png" alt="image-20201029050625740"></p>
 <p>将请求转接给网关后，需要在网关配置</p>
 <figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="attr">id:</span> <span class="string">gulimall_host_route</span></span><br><span class="line">  <span class="attr">uri:</span> <span class="string">lb://gulimall-product</span></span><br><span class="line">  <span class="attr">predicates:</span></span><br><span class="line">    <span class="bullet">-</span> <span class="string">Host=**.gulimall.com</span></span><br></pre></td></tr></table></figure>
 
 <p>最后放几张图方便理解哈</p>
-<p><img src="/nginx/image-20201029050828421.png" alt="image-20201029050828421"></p>
-<p><img src="/nginx/image-20201029050901546.png" alt="image-20201029050901546"></p>
+<img src="/.io//07/20/Java/nginx%E7%9A%84%E4%BD%BF%E7%94%A8/nginx/image-20201029050828421.png" class title="image-20201029050828421">
+
+
+
+<img src="/.io//07/20/Java/nginx%E7%9A%84%E4%BD%BF%E7%94%A8/nginx/image-20201029050901546.png" class title="image-20201029050901546">
+
  
       <!-- reward -->
       

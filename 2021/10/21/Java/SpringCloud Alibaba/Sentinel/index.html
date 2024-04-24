@@ -129,7 +129,8 @@
 </ul>
 </li>
 </ul>
-<h4 id="2、Hystrix-与-Sentinel-比较"><a href="#2、Hystrix-与-Sentinel-比较" class="headerlink" title="2、Hystrix 与 Sentinel 比较"></a>2、Hystrix 与 Sentinel 比较</h4><p><img src="/Sentinel/image-20201125120634969.png" alt="image-20201125120634969"></p>
+<h4 id="2、Hystrix-与-Sentinel-比较"><a href="#2、Hystrix-与-Sentinel-比较" class="headerlink" title="2、Hystrix 与 Sentinel 比较"></a>2、Hystrix 与 Sentinel 比较</h4><img src="/.io//10/21/Java/SpringCloud%20Alibaba/Sentinel/image-20201125120634969.png" class title="image-20201125120634969">
+
 <h4 id="3、整合-Feign-和-Sentinel-测试熔断降级"><a href="#3、整合-Feign-和-Sentinel-测试熔断降级" class="headerlink" title="3、整合 Feign 和 Sentinel 测试熔断降级"></a>3、整合 Feign 和 Sentinel 测试熔断降级</h4><p>熔断降级官网解释：<a target="_blank" rel="noopener" href="https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7">https://github.com/alibaba/Sentinel/wiki/%E7%86%94%E6%96%AD%E9%99%8D%E7%BA%A7</a></p>
 <p>Spring-  Cloud整合Sentinel和Feign：<a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel">https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel</a></p>
 <p>pom.xml</p>
@@ -140,20 +141,29 @@
 
 <p>开启后，在微服务中调用远程服务，Sentinel 就会记录微服务之间的调用，从而对远程调用进行设置熔断降级等。</p>
 <p>请求设置</p>
-<p><img src="/Sentinel/image-20201126154714221.png" alt="image-20201126154714221"></p>
+<img src="/.io//10/21/Java/SpringCloud%20Alibaba/Sentinel/image-20201126154714221.png" class title="image-20201126154714221">
+
 <p>设置流控规则</p>
-<p><img src="/Sentinel/image-20201126165501709.png" alt="image-20201126165501709"></p>
+<img src="/.io//10/21/Java/SpringCloud%20Alibaba/Sentinel/image-20201126165501709.png" class title="image-20201126165501709">
+
 <p>Feign设置</p>
-<p><img src="/Sentinel/image-20201126165336761.png" alt="image-20201126165336761"></p>
+<img src="/.io//10/21/Java/SpringCloud%20Alibaba/Sentinel/image-20201126165336761.png" class title="image-20201126165336761">
+
 <p>结果</p>
-<p><img src="/Sentinel/image-20201126164858768.png" alt="image-20201126164858768"></p>
+<img src="/.io//10/21/Java/SpringCloud%20Alibaba/Sentinel/image-20201126164858768.png" class title="image-20201126164858768">
+
+
+
+
+
 <h4 id="4、整合-Sentinel-测试限流"><a href="#4、整合-Sentinel-测试限流" class="headerlink" title="4、整合 Sentinel 测试限流"></a>4、整合 Sentinel 测试限流</h4><p>官网Spring-Cloud 整合：<a target="_blank" rel="noopener" href="https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel">https://github.com/alibaba/spring-cloud-alibaba/wiki/Sentinel</a></p>
 <p>Pom.xml</p>
 <blockquote>
 <p>参考 3、整合 Feign 和 Sentinel 测试熔断降级</p>
 </blockquote>
 <p>控制台：</p>
-<p><img src="/Sentinel/image-20201126161848389.png"></p>
+<img src="/.io//10/21/Java/SpringCloud%20Alibaba/Sentinel/image-20201126161848389.png" class>
+
 <p>超过单继阈值，返回自定义请求结果</p>
 <p>实现方式：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">  		1、代码</span></span><br><span class="line"><span class="comment"> *      	try (Entry entry = SphU.entry(&quot;resourceName&quot;)) &#123;</span></span><br><span class="line"><span class="comment"> *      	&#125;(BlockedException e)&#123;&#125;</span></span><br><span class="line"><span class="comment"> *      2、基于注解</span></span><br><span class="line"><span class="comment"> *       	<span class="doctag">@SentinelResource</span>(value = &quot;getCurrentSeckillSkusSource&quot;,blockHandler = &quot;BlockHandler&quot;)</span></span><br><span class="line"><span class="comment"> *       	无论1/2方式一定要配置限流以后的默认返回</span></span><br><span class="line"><span class="comment"> *       	url可以设置统一返回</span></span><br><span class="line"><span class="comment"></span></span><br><span class="line"><span class="comment">**/</span></span><br></pre></td></tr></table></figure>
@@ -164,7 +174,10 @@
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>com.alibaba.cloud<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-cloud-alibaba-sentinel-gateway<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">version</span>&gt;</span>2.1.0.RELEASE<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
 <p>启动Sentinle1.7.1 后比原先的1.6.1多个一个功能</p>
-<p><img src="/Sentinel/image-20201127102052864.png" alt="image-20201127102052864"></p>
+<img src="/.io//10/21/Java/SpringCloud%20Alibaba/Sentinel/image-20201127102052864.png" class title="image-20201127102052864">
+
+
+
 <p>您可以在 <code>GatewayCallbackManager</code> 注册回调进行定制：</p>
 <ul>
 <li><code>setBlockHandler</code>：注册函数用于实现自定义的逻辑处理被限流的请求，对应接口为 <code>BlockRequestHandler</code>。默认实现为 <code>DefaultBlockRequestHandler</code>，当被限流时会返回类似于下面的错误信息：<code>Blocked by Sentinel: FlowException</code>。</li>
@@ -173,7 +186,7 @@
 
 
 
-<h3 id=""><a href="#" class="headerlink" title=""></a></h3> 
+<h3 id><a href="#" class="headerlink" title></a></h3> 
       <!-- reward -->
       
     </div>
